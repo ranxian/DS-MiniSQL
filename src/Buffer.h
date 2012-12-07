@@ -31,7 +31,7 @@ class tableFileCond
 	unsigned long pageNum; //文件已有页总数
 	char lastModifiedTime[20]; //最近一次修改时间
 	void initialfileCond(); //信息初始化	
-}
+};
 
 //文件指针
 class filePtr
