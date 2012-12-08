@@ -5,9 +5,15 @@ typedef struct
     char tableName[32];             // 表名，最长 32 位
     int totalColumn;                // 字段数
     int totalLenght;                // 一个记录占的字节数
-    int keyAttrNum;                 // 多字段主键中字段数
+
     pColumnInfo primaryKey;         // 指向主键的指针
 } tableInfo;
+
+// 字段的类型
+typedef enum {
+    INT,
+    CHAR
+} columnType;
 
 // 存放 字段的信息 的结构
 typedef struct *columnInfo pColumnInfo;
