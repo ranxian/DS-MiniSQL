@@ -1,0 +1,28 @@
+/*----------constant variables for indentifying command type------------------*/
+extern const int CREATE_TABLE = 0;
+extern const int CREATE_INDEX = 1;
+extern const int CREATE_DATABASE = 2;
+extern const int SELECT = 3;
+extern const int INSERT = 4;
+extern const int DROP_TABLE = 5;
+extern const int DROP_INDEX = 6;
+extern const int DROP_DATABASE = 7;
+extern const int DELETE = 8;
+extern const int QUIT = 9;
+extern const int EXECFILES = 10;
+
+
+class Interpreter
+{
+public:
+    void inputCommand();
+    bool parseCommand();
+    void getCondition(std::vector<string> command, ConditionTree * condition);
+    int getCommandType();
+private:
+    int commandType;
+    std::vector<string> command;
+    std::vector<string> selectedItems;
+    std::vector<string> selectedTables;
+    Table t;
+};
