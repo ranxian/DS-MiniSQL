@@ -24,5 +24,4 @@ typedef struct
     columnType colType;             // 字段类型，int/char
     int colLength;                  // 字段占的字节数
     pColumnInfo next;               // 指向下一个字段的指针
-    pconstraintInfo constraint;     // 指向此字段的约束条件的指针
 } columnInfo;
