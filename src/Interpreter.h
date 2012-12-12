@@ -1,3 +1,4 @@
+# include <string>
 /*----------constant variables for indentifying command type------------------*/
 extern const int CREATE_TABLE = 0;
 extern const int CREATE_INDEX = 1;
@@ -21,6 +22,7 @@ public:
     int getCommandType();
 private:
     int commandType;
+    string input;
     std::vector<string> command;
     std::vector<string> selectedItems;
     std::vector<string> selectedTables;
