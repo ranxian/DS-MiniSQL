@@ -7,10 +7,9 @@ BUffer类的实现
 
 
 */
-#define FILE_PAGESIZE 4096   //虚拟页大小
-#define MEM_MAXPAGE 1000   //内存页最大数目
-#define FILENAME_MAXLEN 256   //文件名最大长度
- 
+#include "Definition.h"
+
+
 #include<iostream>
 using namespace std;
 
