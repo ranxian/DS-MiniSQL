@@ -20,6 +20,7 @@ void Interpreter::parseCommand()
     int index, start;
     start = input.find_first_not_of(seperators);
 
+    // cut into pieces
     while (start != string::npos)
     {
         index = input.find_first_of(seperators,start);
@@ -34,6 +35,10 @@ void Interpreter::parseCommand()
             start = input.find_first_not_of(seperators,index+1);
         }
     }
+
+    //     interprete the input
+
+    // Create database or create table
     if (command[0] == "create" || command[0] == "CREATE")
     {
         if (command[1] == "DATABASE" || command[1] == "database")
@@ -58,6 +63,7 @@ void Interpreter::parseCommand()
         }
 
     }
+    // select from table
     else if (command[0] == "select" || command[0] == "SELECT")
     {
         commandType = SELECT;
@@ -72,11 +78,17 @@ void Interpreter::parseCommand()
         if (i == command.size()-1)
             return;
         // build condition Tree
+        // not finished
     }
+
+    // insert into table
     else if (command[0] == "insert" || command[0] == "INSERT")
     {
         commandType = INSERT;
+        // not ready
     }
+
+    // drop table or database
     else if (command[0] == "drop" || command[0] == "DROP")
     {
         if (commad[1] == "TABLE" || command[1] == "table")
@@ -90,14 +102,20 @@ void Interpreter::parseCommand()
             info.databaseName = command[2];
         }
     }
+
+    // delete
     else if (command[0] == "delete" || command[0] == "DELETE")
     {
-
+        // not ready
     }
+
+    // quit
     else if (command[0] == "quit" || command[0] == "QUIT")
     {
         commandType = QUIT;
     }
+
+    // exec some files
     else if (command[0] == "execfiles" || command[0] == "EXECFILES")
     {
         commandType = EXECFILES;
