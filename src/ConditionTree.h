@@ -1,4 +1,4 @@
-# include <string>
+#include <string>
 
 /*----------constant variables for operation type------------------*/
 extern const int COMPARISON = 0;

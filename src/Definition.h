@@ -2,7 +2,7 @@
 /*
 *   Index.[h, cpp]
 */
-#define MAX_KEY_NUM 9 // B+ 树的阶
+#define MAX_ATTR_NUM 32
 /********************************************************/
 /*
 *   Buffer.[h, cpp]

@@ -1,3 +1,8 @@
+#ifndef CATALOG_H
+#define CATALOG_H
+
+#include "Interpreter.h"
+
 // 存放 表的信息 的结构
 typedef struct *tableInfo pTableInfo;
 typedef struct
@@ -5,7 +10,8 @@ typedef struct
     char tableName[32];             // 表名，最长 32 位
     int totalAttr;                  // 字段数
     int totalLenght;                // 一个记录占的字节数
-    pAttrInfo primaryKey;           // 指向主键的指针
+    attrInfo attr[MAX_ATTR_NUM];    // 字段
+
 } tableInfo;
 
 // 字段的类型
@@ -23,7 +29,7 @@ typedef struct
     int colLength;                  // 字段占的字节数
     int isUnique;                   // 是否应该具有唯一值
     attrType colType;               // 字段类型，int/char
-    pAttrInfo next;                 // 指向下一个字段的指针
+
 } attrInfo;
 
 /***********************************************************/
@@ -31,19 +37,19 @@ typedef struct
 class Catalog
 {
 public:
-    bool tableExist(token);             // 返回表是否存在
-    bool attrExist(token);              // 返回字段是否存在
-    bool attrTypeCheck(token);          // 返回字段信息是否满足类型条件
-    bool attrConstraintCheck(token);    // 返回字段信息是否满足约束条件
+    bool tableExist(struct Information_t token);             // 返回表是否存在
+    bool attrExist(struct Information_t token);              // 返回字段是否存在
+    bool attrTypeCheck(struct Information_t token);          // 返回字段信息是否满足类型条件
 
-    pAttrInfo findAttr(token);          // 返回要求的字段的结构（指针）
+    pAttrInfo findAttr(struct Information_t token);             // 返回要求的字段信息
+    pAttrInfo getPrimaryAttrName(struct Information_t token);   // 返回主键的字段信息（然后去找索引）
 
-    void create(token);                 // 建表
-    void select(token);                 // 查表
-    void insert(token);                 // 插入字段
-    void delete(token);                 // 删除
+    void create(struct Information_t token);                 // 建表
+    void delete(struct Information_t token);                 // 删除表
 
     Catalog();
     ~Catalog();
 private:
 };
+
+#endif
