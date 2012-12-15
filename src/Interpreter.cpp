@@ -34,6 +34,16 @@ void Interpreter::parseCommand()
     }
     if (command[0] == "create" || command[0] == "CREATE")
     {
+        if (command[1] == "DATABASE" || command[1] == "database")
+        {
+            commandType = CREATE_DATABASE;
+            info.databaseName = command[2];
+        }
+        else if (command[1] == "TABLE" || command[1] == "table")
+        {
+            commandType = CREATE_TABLE;
+            info.tableName = command[2];
+        }
 
     }
     else if (command[0] == "select" || command[0] == "SELECT")
@@ -54,10 +64,16 @@ void Interpreter::parseCommand()
     }
     else if (command[0] == "quit" || command[0] == "QUIT")
     {
-
+        commandType = QUIT;
     }
     else if (command[0] == "execfiles" || command[0] == "EXECFILES")
     {
-        
+        commandType = EXECFILES;
+        info.fileNmae = command[1];
     }
+}
+
+Information_t Interpreter::getInfo()
+{
+    return info;
 }
