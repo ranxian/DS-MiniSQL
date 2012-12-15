@@ -1,4 +1,6 @@
 # include "Interpreter.h"
+# include <string.h>
+
 
 int Interpreter::getCommandType()
 {
@@ -43,20 +45,50 @@ void Interpreter::parseCommand()
         {
             commandType = CREATE_TABLE;
             info.tableName = command[2];
+            char * str = info.tableName.c_str();
+            str[31] = '\0';
+            strcpy(info.t.tableName, str);
+             int n = (comand.size()-5)/2;
+             info.t.totalAttr = n;
+             for (int i = 0; i < n; i++)
+             {
+                // input information to table
+                // table not ready yet?
+             }
         }
 
     }
     else if (command[0] == "select" || command[0] == "SELECT")
     {
-
+        commandType = SELECT;
+        int i = 1;
+        while (command[i] != "FROM" && command[i] != "from")
+        {
+            selectedItems.push_back(command[i]);
+            i++;
+        }
+        i++;
+        tableName = command[i];
+        if (i == command.size()-1)
+            return;
+        // build condition Tree
     }
     else if (command[0] == "insert" || command[0] == "INSERT")
     {
-
+        commandType = INSERT;
     }
     else if (command[0] == "drop" || command[0] == "DROP")
     {
-
+        if (commad[1] == "TABLE" || command[1] == "table")
+        {
+            commandType = DROP_TABLE;
+            info.tableName = command[2];
+        }
+        else if (command[1] == "DATABASE" || command[1] == "database")
+        {
+            commandType = DROP_DATABASE;
+            info.databaseName = command[2];
+        }
     }
     else if (command[0] == "delete" || command[0] == "DELETE")
     {
