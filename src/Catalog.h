@@ -28,7 +28,7 @@ typedef struct
     int isPrimary;                  // 是否主键
     int colLength;                  // 字段占的字节数
     int isUnique;                   // 是否应该具有唯一值
-    attrType colType;               // 字段类型，int/char
+    attrType type;                  // 字段类型，int/char
 
 } attrInfo;
 
@@ -37,15 +37,15 @@ typedef struct
 class Catalog
 {
 public:
-    bool tableExist(struct Information_t token);             // 返回表是否存在
-    bool attrExist(struct Information_t token);              // 返回字段是否存在
-    bool attrTypeCheck(struct Information_t token);          // 返回字段信息是否满足类型条件
+    bool tableExist(char *tableName);                           // 返回表是否存在
+    bool attrExist(struct Information_t token);                 // 返回字段是否存在
+    bool attrTypeCheck(struct Information_t token);             // 返回字段信息是否满足类型条件
 
     pAttrInfo findAttr(struct Information_t token);             // 返回要求的字段信息
     pAttrInfo getPrimaryAttrName(struct Information_t token);   // 返回主键的字段信息（然后去找索引）
 
-    void create(struct Information_t token);                 // 建表
-    void delete(struct Information_t token);                 // 删除表
+    void create(struct Information_t token);                    // 建表
+    void delete(struct Information_t token);                    // 删除表
 
     Catalog();
     ~Catalog();
