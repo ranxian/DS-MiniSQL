@@ -17,7 +17,6 @@ extern const int DELETE = 8;
 extern const int QUIT = 9;
 extern const int EXECFILES = 10;
 
-
 class Interpreter
 {
 public:
