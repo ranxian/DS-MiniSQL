@@ -9,33 +9,20 @@
 *   NOTE: 由于 B+ 树的代码量碉堡了，改用 线性索引 方式实现，若还有余力再改为 B+ 树
 *         现在采用从小到大的顺序排列
 */
-// 单个索引项（一个索引节点） 的结构
-typedef *indexNode pIndexNode;
+/* 索引名 */
 typedef struct 
 {
-    char *value;                // 索引字段的值
-    unsigned pageNum;           // 记录所在的页号
-    unsigned long pageOffset;   // 记录所在页的页偏移
+    string value;       // 关键码
+    void *basep;        // 内存中的基地址
+    unsigned offset;    // basep 的偏移
+} indexNode_t;
 
-    pIndexNode nextNode;
-
-} indexNode;
-
-// 索引头（一组索引对应一个索引头）
-typedef struct
+/* 索引头 */
+typedef struct 
 {
-    pAttrInfo pAttr;            // 索引对应的字段信息
-    pIndexNode firstNode;       // 第一个索引项
-} indexHead;
-
-// 存储 查找结果 的结构
-typedef indexResult *pIndexResult;
-typedef struct
-{
-    unsigned pageNum;           // 记录所在的页号
-    unsigned long pageOffset;   // 记录所在页的页偏移
-
-} indexResult;
+    attr_t attr;            // 做索引的字段
+    indexNode_t *firstNode; // 指向第一个索引
+} indexHead_t;
 
 /***********************************************************/
 
