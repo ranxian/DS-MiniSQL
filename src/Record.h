@@ -6,14 +6,6 @@
 #include<iostream>
 using namespace std;
 
-typedef struct 
-{   
-    attrtype_t type;
-    string str_value;
-    int int_value;
-    record_t *next;
-} record_t;
-
 class Record
 {
 public:

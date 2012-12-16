@@ -10,13 +10,13 @@ table_t findTable(string tableName)
     
 }
 
-void Catalog::create(table_t & table)
+void Catalog::createTable(table_t & table)
 {
     string fileName = table.name + ".table";
 
 }
 
-void Catalog::delete(table_t & table)
+void Catalog::deleteTable(table_t & table)
 {
 
 }
@@ -28,7 +28,6 @@ bool Catalog::tableExist(string tableName)
     fin.open(TABLE_LIST, ios::in);
 
     char curTableName[MAX_FILENAME_LENGTH];   
-    string tableName;
 
     while (!fin.eof())
     {

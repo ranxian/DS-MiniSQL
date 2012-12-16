@@ -1,6 +1,5 @@
 #include "API.h"
 int API::createTable() {}
-int API::dropTable() {}
 int API::createIndex() {}
 int API::select() {}
 int API::insert() {}

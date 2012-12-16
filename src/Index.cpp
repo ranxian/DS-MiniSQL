@@ -204,7 +204,7 @@ void Index::insert(attr_t attribute, string value)
     }
 }
 
-void Index::delete(attr_t attribute, string value)
+void Index::deleteIndex(attr_t attribute, string value)
 {
     // 根据字段信息获得字段值的类型
     bool isInt = 0;

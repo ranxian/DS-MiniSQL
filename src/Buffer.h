@@ -3,9 +3,6 @@ BUffer类的实现
 1.读取指定数据到系统缓冲区或者将缓冲区中的数据写出到文件
 2.用CLOCK算法进行页替换
 3.对缓冲区中各页的状态进行记录
-
-
-
 */
  
 #include<iostream>
@@ -130,6 +127,4 @@ private:
 	table *first;  										//第一个打开的文件
 	table *last; 										//最后一个打开的文件
 	table *currTable; 									//当前正在操作的文件
-	
-
-}
+};
