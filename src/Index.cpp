@@ -1,37 +1,37 @@
 #include "index.h"
 
-pIndexResult Index::select(pAttrInfo *attrInfo, char *value)
+index_node_t *Index::select(attr_t attribute, string value)
 {
     // 根据字段信息获得字段值的类型
     bool isInt = 0;
-    if (attrInfo->type == INT)
+    if (attribute->type == INT)
         isInt = 1;
     else
         isInt = 0;
 
     // 根据索引名找到索引文件中的索引头
-    indexHead idxHd;
-    indexNode curNode = idxHd.firstNode;
+    index_head_t idxHd;
+    index_node_t curNode = idxHd.firstNode;
+    // ...
 
     // 字段类型是整型
     if (isInt)
     {
-        int iValue = atoi(value);
-        int curValue = atoi(curNode.value); 
+        int iValue = atoi(value.c_str());
+        int curValue = atoi(curNode.value.c_str()); 
 
         // 查找该索引项
         while (curNode != NULL)
         {
-            curValue = atoi(curNode.value);
+            curValue = atoi(curNode.value.c_str());
 
             // 找到了要提取的索引项
             if (curValue == iValue)
             {
-                selectResult.pageNum = curNode.pageNum;
-                selectResult.pageOffset = curNode.pageOffset;
+                selectResult.basep = curNode.basep;
+                selectResult.offset = curNode.offset;
                 return &selectResult;
             }
-
             curNode = curNode.nextNode;
         }
 
@@ -45,7 +45,7 @@ pIndexResult Index::select(pAttrInfo *attrInfo, char *value)
     // 字段类型是字符串
     else
     {
-        char *curValue = curNode.value; 
+        string curValue = curNode.value; 
 
         // 查找该索引项
         while (curNode != NULL)
@@ -55,8 +55,8 @@ pIndexResult Index::select(pAttrInfo *attrInfo, char *value)
             // 找到了要提取的索引项
             if (curValue == value)
             {
-                selectResult.pageNum = curNode.pageNum;
-                selectResult.pageOffset = curNode.pageOffset;
+                selectResult.basep = curNode.basep;
+                selectResult.offset = curNode.offset;
                 return &selectResult;
             }
 
@@ -71,35 +71,37 @@ pIndexResult Index::select(pAttrInfo *attrInfo, char *value)
     }
 }
 
-void Index::create(pAttrInfo *attrInfo)
+void Index::create(attr_t attribute)
 {
-    indexHead idxHd = new indexHead;
-    idxhd.pAttr = *(attrInfo);
+    index_head_t idxHd = new index_head_t;
+    idxhd.attr = attribute;
     idxhd.firstNode = NULL;
 }
 
-void Index::insert(pAttrInfo *attrInfo, char *value)
+void Index::insert(attr_t attribute, string value)
 {
     // 根据字段信息获得字段值的类型
     bool isInt = 0;
-    if (attrInfo->type == INT)
+    if (attribute->type == INT)
         isInt = 1;
     else
         isInt = 0;
 
     // 根据 Record 的信息获得 页号 和 页偏移
-    unsigned pgNum;
-    unsigned long pgOffset;
+    void *basep;
+    unsigned offset;
+    // ...
 
     // 建立新索引项
-    indexNode idxNode = new indexNode;
+    index_node_t idxNode = new index_node_t;
     memcpy(idxNode.value, value, strlen(value));
-    idxNode.pageNum = pgNum;
-    idxNode.pageOffset = pgOffset;
+    idxNode.basep = basep;
+    idxNode.offset = offset;
     idxNode.nextNode = NULL;
 
     // 根据索引名找到索引文件中的索引头
-    indexHead idxHd;
+    index_head_t idxHd;
+    // ...
 
     // 若索引还是空的，那么就创建第一个索引
     if (idxHd.firstNode == NULL)
@@ -111,12 +113,12 @@ void Index::insert(pAttrInfo *attrInfo, char *value)
     // 若索引不是空的，那么就找到合适的地方插入
     if (idxHd.firstNode != NULL)
     {
-        indexNode curNode = idxHd.firstNode;
+        index_node_t curNode = idxHd.firstNode;
         // 字段类型是整型
         if (isInt)
         {
-            int iValue = atoi(value);
-            int curValue = atoi(curNode.value); 
+            int iValue = atoi(value.c_str());
+            int curValue = atoi(curNode.value.c_str()); 
 
             // 已有相同值，无法插入
             if (curValue == iValue)
@@ -143,22 +145,22 @@ void Index::insert(pAttrInfo *attrInfo, char *value)
                 }
 
                 // 插到中间
-                else if (atoi(curNode.nextNode.value) > iValue)
+                else if (atoi(curNode.nextNode.value.c_str()) > iValue)
                 {
-                    indexNode nextNode = curNode.nextNode;
+                    index_node_t nextNode = curNode.nextNode;
                     curNode.nextNode = idxNode;
                     idxNode.nextNode = nextNode;
                     return;
                 }
 
                 curNode = curNode.nextNode;
-                curValue = atoi(curNode.value);
+                curValue = atoi(curNode.value.c_str());
             }
         }
         // 字段类型是字符串
         else
         {
-            char *curValue = curNode.value;
+            string curValue = curNode.value;
 
             // 已有相同值，无法插入
             if (curValue == value)
@@ -187,7 +189,7 @@ void Index::insert(pAttrInfo *attrInfo, char *value)
                 // 插到中间
                 else if (curNode.nextNode.value > curValue)
                 {
-                    indexNode nextNode = curNode.nextNode;
+                    index_node_t nextNode = curNode.nextNode;
                     curNode.nextNode = idxNode;
                     idxNode.nextNode = nextNode;
                     return;
@@ -200,7 +202,7 @@ void Index::insert(pAttrInfo *attrInfo, char *value)
     }
 }
 
-void Index::delete(pAttrInfo *attrInfo, char *value)
+void Index::delete(attr_t attribute, string value)
 {
     // 根据字段信息获得字段值的类型
     bool isInt = 0;
@@ -210,19 +212,20 @@ void Index::delete(pAttrInfo *attrInfo, char *value)
         isInt = 0;
 
     // 根据索引名找到索引文件中的索引头
-    indexHead idxHd;
-    indexNode curNode = idxHd.firstNode;
+    index_head_t idxHd;
+    // ...
+    index_node_t curNode = idxHd.firstNode;
 
     // 字段类型是整型
     if (isInt)
     {
-        int iValue = atoi(value);
-        int curValue = atoi(curNode.value); 
+        int iValue = atoi(value.c_str());
+        int curValue = atoi(curNode.value.c_str()); 
 
         // 第一项即该索引项，删除之
         if (curValue == iValue)
         {
-            indexNode nextNode = curNode.nextNode;
+            index_node_t nextNode = curNode.nextNode;
             idxHd.firstNode = nextNode;
             delete curNode;
             return;
@@ -232,11 +235,11 @@ void Index::delete(pAttrInfo *attrInfo, char *value)
         while (true)
         {
             // 如果下一个索引项是要找的索引项
-            if (atoi(curNode.nextNode.value) == iValue)
+            if (atoi(curNode.nextNode.value.c_str()) == iValue)
             {
-                indexNode prevNode = curNode;
-                indexNode curNode = curNode.nextNode;
-                indexNode nextNode = curNode.nextNode;
+                index_node_t prevNode = curNode;
+                index_node_t curNode = curNode.nextNode;
+                index_node_t nextNode = curNode.nextNode;
 
                 delete curNode;
                 prevNode.nextNode = nextNode;
@@ -244,18 +247,18 @@ void Index::delete(pAttrInfo *attrInfo, char *value)
             }
 
             curNode = curNode.nextNode;
-            curValue = atoi(curNode.value);
+            curValue = atoi(curNode.value.c_str());
         }
     }
     // 字段类型是字符串
     else
     {
-        char *curValue = curNode.value; 
+        string curValue = curNode.value; 
 
         // 第一项即该索引项，删除之
         if (curValue == value)
         {
-            indexNode nextNode = curNode.nextNode;
+            index_node_t nextNode = curNode.nextNode;
             idxHd.firstNode = nextNode;
             delete curNode;
             return;
@@ -267,9 +270,9 @@ void Index::delete(pAttrInfo *attrInfo, char *value)
             // 如果下一个索引项是要找的索引项
             if (curNode.nextNode.value == value)
             {
-                indexNode prevNode = curNode;
-                indexNode curNode = curNode.nextNode;
-                indexNode nextNode = curNode.nextNode;
+                index_node_t prevNode = curNode;
+                index_node_t curNode = curNode.nextNode;
+                index_node_t nextNode = curNode.nextNode;
 
                 delete curNode;
                 prevNode.nextNode = nextNode;
@@ -282,7 +285,7 @@ void Index::delete(pAttrInfo *attrInfo, char *value)
     }
 }
 
-void Index::update(pAttrInfo *attrInfo, char *value, char *newValue)
+void Index::update(attr_t attribute, string value, string newValue)
 {
     // 根据字段信息获得字段值的类型
     bool isInt = 0;
@@ -292,14 +295,15 @@ void Index::update(pAttrInfo *attrInfo, char *value, char *newValue)
         isInt = 0;
 
     // 根据索引名找到索引文件中的索引头
-    indexHead idxHd;
-    indexNode curNode = idxHd.firstNode;
+    index_head_t idxHd;
+    // ...
+    index_node_t curNode = idxHd.firstNode;
 
     // 字段类型是整型
     if (isInt)
     {
-        int iValue = atoi(value);
-        int curValue = atoi(curNode.value); 
+        int iValue = atoi(value.c_str());
+        int curValue = atoi(curNode.value.c_str()); 
 
         // 查找该索引项
         while (true)
@@ -313,13 +317,13 @@ void Index::update(pAttrInfo *attrInfo, char *value, char *newValue)
             }
 
             curNode = curNode.nextNode;
-            curValue = atoi(curNode.value);
+            curValue = atoi(curNode.value.c_str());
         }
     }
     // 字段类型是字符串
     else
     {
-        char *curValue = curNode.value; 
+        string curValue = curNode.value; 
 
         // 查找该索引项
         while (true)

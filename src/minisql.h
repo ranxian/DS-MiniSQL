@@ -7,6 +7,7 @@
 
 /* 引用库 */
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <cstdlib>
 #include <fstream>
