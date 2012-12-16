@@ -11,6 +11,7 @@ void Interpreter::inputCommand()
 
 void Interpreter::parseCommand()
 {
+    clearInfo();
     int start, index;
     string seperators=" , \n";
 
@@ -56,8 +57,9 @@ Info_t Interpreter::getInfo()
     return info;
 }
 
-void Interpreter::parseCreate()
+void Interpreter::parseCreate() // OK
 {
+    clearInfo();
     int count = 0;
     int i = 4;
     int length = 0;
@@ -106,24 +108,29 @@ void Interpreter::parseCreate()
     info.t.recordLength = length;
 }
 
-void Interpreter::parseHelp()
+void Interpreter::parseHelp()   // OK
 {
+    clearInfo();
     info.command = HELP;
 }
 
-void Interpreter::parseQuit()
+void Interpreter::parseQuit()   //OK
 {
+    clearInfo();
     info.command = QUIT;
 }
 
-void Interpreter::parseDrop()
+void Interpreter::parseDrop()   //OK
 {
+    clearInfo();
     info.command = DROP_TABLE;
     info.tableName = command[2];
 }
 
-void Interpreter::parseSelect()
+void Interpreter::parseSelect() //!
 {
+    clearInfo();
+    info.command = SELECT;
     int i = 1;
     while (command[i] != "from" && command[i] != "FROM")
     {
@@ -140,5 +147,64 @@ void Interpreter::parseSelect()
     {
         // build condition tree
     }
+}
+
+void Interpreter::parseDelete() //!
+{
+    clearInfo();
+    info.command = DELETE;
+    info.command = DELETE;
+    info.tableName = command[2];
+    if (command.size() == 3)
+    {
+        info.tree = NULL;
+    }
+    else
+    {
+        // build condition tree
+    }
+}
+
+void Interpreter::clearInfo()
+{
+    info.command = NONE;
+    info.tableName = "";
+    ino.tree = NULL;
+    info.selectedItems.clear();
+    info.selectedTable.clear();
+    info.insertItems.clear();
+}
+
+void Interpreter::parseInsert()  //OK
+{
+    clearInfo();
+    info.command = INSERT;
+    info.tableName = command[2];
+    int index1 = index2 = 4;
+    while (command[index2] != "(")
+        index2++;
+    index2++;
+    while (command[index1] != ")")
+    {
+        insertItems.insert(map<string,string>::value_type(command[index1],command[index2]));
+    }
+}
+
+void Interpreter::parseUpdate() //!
+{
+    clearInfo();
+    info.command = UPDATE;
+    info.tableName = command[1];
+    int index1 = 3;
+    int index2 = 5;
+    updateItems.insert(map<string,string>::value_type(command[index1],command[index2]));
+    if (command.size() != 6)
+    {
+        if (command[6] == "where" || command[6] == "WHERE")
+        {
+            // build tree
+        }
+    }
+
 }
 
