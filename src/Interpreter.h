@@ -4,18 +4,53 @@
 #include "Table.h"
 #include "Catalog.h"
 #include "ConditionTree.h"
-/*----------constant variables for indentifying command type------------------*/
-extern const int CREATE_TABLE = 0;
-extern const int CREATE_INDEX = 1;
-extern const int CREATE_DATABASE = 2;
-extern const int SELECT = 3;
-extern const int INSERT = 4;
-extern const int DROP_TABLE = 5;
-extern const int DROP_INDEX = 6;
-extern const int DROP_DATABASE = 7;
-extern const int DELETE = 8;
-extern const int QUIT = 9;
-extern const int EXECFILES = 10;
+/* 语法元素定义 */
+/* 运算符类型 */
+typedef enum {
+    EQ,     // ==
+    NE,     // <>
+    GT,     // >
+    LT,     // <
+    GTE,    // >=
+    LTE     // <=
+} oper_t;
+
+/* 逻辑运算 */
+typedef enum {
+    AND,
+    OR
+} logic_t;
+
+/* 字段类型 */
+typedef enum {
+    CHAR,
+    INT
+} attr_t;
+
+/* 操作类型 */
+typedef enum {
+    NONE,           // 无操作
+    CREATE_TABLE,   // 建表
+    DROP_TABLE,     // 删表
+    CREATE_INDEX,   // 建索引 - 不急着做
+    DELETE_INDEX,   // 删索引 - 不急着做
+    UPDATE,         // 更新记录
+    SELECT,         // 查记录
+    DELETE,         // 删记录
+    QUIT,           // 退出程序
+    HELP            // 打印帮助文档 - 不急着做
+} cmd_t;
+
+/* 解析器解析命令后的结果 */
+typdef struct {
+    cmd_t command;
+    string tableName;       // 命令相关的表名
+    tableInfo t;            // 命令相关的表信息
+    std::vector<string> selectedItems; // select 语句中被选择的字段
+    std::vector<string> insertItems;   // insert 语句被更新的字段值
+    ConditionTree * tree;   // 条件树，用于 where 语句
+    // how to transfer insert infomation?? --zqm
+} Info_t;
 
 class Interpreter
 {
@@ -30,18 +65,5 @@ private:
     string input;
     std::vector<string> command;
     Information_t info;
-};
-
-struct  Information_t
-{
-    string databaseName;
-    string tableName;
-    tableInfo t;
-    std::vector<string> selectedItems;
-    ConditionTree * tree;
-    string fileName;
-    // how to transfer insert infomation??
-
-
 };
 #endif

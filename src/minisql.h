@@ -1,19 +1,24 @@
-#include "Interpreter.h"
-#include <string>
-#include <iostream>
-using namespace std;
-Catalog catlog_manager;
+/**************************** 
+ * MiniSQL.h - 宏定义，配置文件 
+ ****************************/
 
-void Init();
-void Run();
-void Exit();
-void createTable(Information_t *info);
-void createIndex(Information_t *info);
-void createDatabse(Information_t *info);
-void select(Information_t *info);
-void insert(Information_t *info);
-void dropTable(Information_t *info);
-void dropIndex(Information_t *info);
-void dropDatabase(Information_t *info);
-void deleteRecord(Information_t *info);
-void execfiles(Information_t *info);
+#ifndef MINISQL_H
+#define MINISQL_H
+
+/* 引用库 */
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <fstream>
+
+/* 常用宏定义 */
+#define MAX_FILENAME_LENGTH 256 /* 最长文件名长度 */
+#define MAX_CMD_LENGTH      256 /* 最长命令长度 */
+#define MAX_ATTRNAME_LENGTH 256 /* 最长字段长度 */
+#define MAX_RECORD_LENGTH   256 /* 最长记录长度 */
+
+#define TABLE_LIST "table.list" /* 保存表信息的文件 */
+#define INDEX_LIST "index.list" /* 保存索引信息的文件 */
+
+
+#endif
