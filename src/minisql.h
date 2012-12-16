@@ -30,5 +30,6 @@
 #define FILE_PAGESIZE 4096      /* 虚拟页大小 */
 #define MEM_MAXPAGE 1000        /* 内存页最大数目 */
 #define FILENAME_MAXLEN 256     /* 文件名最大长度 */
+#define MAX_CHAR_LENGTH     32
 
 #endif
