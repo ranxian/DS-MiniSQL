@@ -1,8 +1,6 @@
 #ifndef CATALOG_H
 #define CATALOG_H
 
-#include "Interpreter.h"
-
 /* 表与字段的结构 */
 /* 字段结构 */
 typedef struct {
@@ -17,8 +15,8 @@ typedef struct {
 typedef struct 
 {
     string name;        // 表名
-    int attrNumber;     // 字段数
     int recordLength;   // 一条记录的字节数
+    int attrNumber;     // 字段数
     attr_t attributes[MAX_ATTR_NUM];    //字段
 } table_t;
 
