@@ -25,7 +25,7 @@ typedef enum {
 typedef enum {
     CHAR,
     INT
-} attr_t;
+} attrtype_t;
 
 /* 操作类型 */
 typedef enum {
