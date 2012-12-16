@@ -27,11 +27,11 @@ typedef struct
 class Index
 {
 public:
-    index_node_t *select(attr_t attribute, string value);                  // 查找关键码为 value 的索引项
-    void create(attr_t attribute);                                         // 建立索引
-    void insert(attr_t attribute, string value);                           // 插入关键码为 value 的新索引项
-    void delete(attr_t attribute, string value);                           // 删除关键码为 value 的索引项
-    void update(attr_t attribute, string value, string newValue);          // 更新关键码为 value 的索引项，新关键码为 newValue
+    void select(string indexName, string value, index_node_t *res);                  // 查找关键码为 value 的索引项
+    void create(string indexName, attr_t & attr);                               // 建立索引
+    void insert(string indexName, index_node_t node);                           // 插入关键码为 value 的新索引项
+    void delete(string indexName, string value);                           // 删除关键码为 value 的索引项
+    void update(string indexName, string value, string newValue);          // 更新关键码为 value 的索引项，新关键码为 newValue
 
     Index();
     ~Index();
