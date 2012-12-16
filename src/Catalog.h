@@ -4,6 +4,7 @@
 #include "Interpreter.h"
 
 /* 表与字段的结构 */
+/* 字段结构 */
 typedef struct {
     string name;        // 字段名
     bool isPrimary;     // 是否主键

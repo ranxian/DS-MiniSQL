@@ -44,8 +44,8 @@ typedef enum {
 /* 条件树的结构 */
 typedef struct
 {
-    condition_tree_t * left;       // 左子树
-    condition_tree_t * right;      // 右子树
+    condition_tree_t * left;    // 左子树
+    condition_tree_t * right;   // 右子树
     logic_t logic;              // 不同条件之间的逻辑关系                    
     oper_t opName;              // ${leftOperand} ${opName} ${rightOperand}
     string leftOperand;         
