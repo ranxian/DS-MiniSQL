@@ -1,4 +1,4 @@
-#include "minisql.h"
+#include "MiniSQL.h"
 
 int main()
 {

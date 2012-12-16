@@ -11,6 +11,14 @@
 #include <cstdlib>
 #include <fstream>
 
+/* 引用模块 */
+#include "Catalog.h"
+#include "Interpreter.h"
+#include "Index.h"
+#include "Buffer.h"
+#include "Record.h"
+#include "API.h"
+
 /* 全局配置 */
 #define MAX_FILENAME_LENGTH 256 /* 最长文件名长度 */
 #define MAX_CMD_LENGTH      256 /* 最长命令长度 */

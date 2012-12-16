@@ -15,14 +15,14 @@ typedef struct
     string value;       // 关键码
     void *basep;        // 内存中的基地址
     unsigned offset;    // basep 的偏移
-} indexNode_t;
+} index_node_t;
 
 /* 索引头 */
 typedef struct 
 {
     attr_t attr;            // 做索引的字段
     indexNode_t *firstNode; // 指向第一个索引
-} indexHead_t;
+} index_head_t;
 
 /***********************************************************/
 
