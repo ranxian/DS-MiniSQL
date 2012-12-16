@@ -16,7 +16,6 @@
 #include "Catalog.h"
 #include "Interpreter.h"
 #include "Index.h"
-#include "Buffer.h"
 #include "Record.h"
 #include "API.h"
 
