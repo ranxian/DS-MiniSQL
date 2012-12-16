@@ -18,4 +18,4 @@ public:
     void Print(record_t *record);
     void PrintHead(table_t & table);
 
-}
+};

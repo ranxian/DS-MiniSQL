@@ -10,9 +10,11 @@ public:
     void inputCommand();                                            // get command from STDIN
     void getCondition(std::vector<string> command, condition_tree_t * condition);  // get condition tree
     info_t getInfo();                                        // get the result after interpretion
+    void debug();                             // print information for debug
+
 private:
     /*--------------parse different types of commands------------------*/
-    bool parseCommand();                                            // parse the input
+    void parseCommand();                                            // parse the input
     void parseInsert();
     void parseSelect();
     void parseCreate();

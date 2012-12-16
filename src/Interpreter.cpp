@@ -6,6 +6,7 @@
 void Interpreter::inputCommand()
 {
     getline(cin, input, ';');
+    cin.get();
     parseCommand();
 }
 
@@ -15,7 +16,6 @@ void Interpreter::parseCommand()
     int start, index;
     string seperators=" , \n";
 
-    int index, start;
     start = input.find_first_not_of(seperators);
 
     // cut into pieces
@@ -52,7 +52,7 @@ void Interpreter::parseCommand()
         parseHelp();
 }
 
-Info_t Interpreter::getInfo()
+info_t Interpreter::getInfo()
 {
     return info;
 }
@@ -161,9 +161,12 @@ void Interpreter::parseDelete() //OK
 
 void Interpreter::clearInfo()
 {
+    command.clear();
     info.command = NONE;
     info.tableName = "";
-    ino.tree = NULL;
+    if (info.tree)
+        delete info.tree;
+    info.tree = NULL;
     info.selectedItems.clear();
     info.selectedTable.clear();
     info.insertItems.clear();
@@ -173,13 +176,14 @@ void Interpreter::parseInsert()  //OK
 {
     info.command = INSERT;
     info.tableName = command[2];
-    int index1 = index2 = 4;
+    int index1 ,index2;
+    index1 = index2 = 4;
     while (command[index2] != "(")
         index2++;
     index2++;
     while (command[index1] != ")")
     {
-        insertItems.insert(map<string,string>::value_type(command[index1],command[index2]));
+        info.insertItems.insert(map<string,string>::value_type(command[index1],command[index2]));
     }
 }
 
@@ -189,7 +193,7 @@ void Interpreter::parseUpdate() //OK
     info.tableName = command[1];
     int index1 = 3;
     int index2 = 5;
-    updateItems.insert(map<string,string>::value_type(command[index1],command[index2]));
+    info.updateItems.insert(map<string,string>::value_type(command[index1],command[index2]));
     if (command.size() != 6)
     {
         if (command[6] == "where" || command[6] == "WHERE")
@@ -200,7 +204,7 @@ void Interpreter::parseUpdate() //OK
 
 }
 
-condition_tree_t * makeTree(int index)
+condition_tree_t * Interpreter::makeTree(int index)
 {
     std::stack<condition_tree_t *> atom;
     std::stack<condition_tree_t *> logic;
@@ -215,14 +219,14 @@ condition_tree_t * makeTree(int index)
             ptr->logic = AND;
             ptr->end = false;
             logic.push(ptr);
-            i++
+            i++;
         }
         else if (command[i] == "OR" || command[i] == "or")
         {
             ptr->logic = OR;
             ptr->end = false;
             logic.push(ptr);
-            i++
+            i++;
         }
         else
         {
@@ -247,7 +251,7 @@ condition_tree_t * makeTree(int index)
             i++;
         }
     }
-    condition_tree_t * ptr1, ptr2;
+    condition_tree_t *ptr1, *ptr2;
     while (logic.size())
     {
         ptr = logic.top();
@@ -265,3 +269,20 @@ condition_tree_t * makeTree(int index)
     return ptr;
 }
 
+void Interpreter::debug()
+{
+    int i;
+    printf("information type: %d\n" ,info.command);
+    printf("tablename: %s\n",info.tableName.c_str() );
+    for (i = 0; i < info.t.attrNumber; i++)
+        printf("%s %d\n",info.t.attributes[i].name.c_str(),info.t.attributes[i].length );
+    if (info.command == SELECT)
+    {
+        printf("selected items:\n");
+        for (i = 0; i < info.selectedItems.size();i++)
+            printf("%s\n",info.selectedItems[i].c_str() );
+        printf("selected table:\n");
+        for (i = 0; i < info.selectedTable.size();i++)
+            printf("%s\n",info.selectedTable[i].c_str() );
+    }
+}
