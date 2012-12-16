@@ -54,13 +54,14 @@ typedef struct
 } condition_tree_t;
 
 /* 解析器解析命令后的结果 */
-typdef struct {
+typedef struct {
     cmd_t command;
     string tableName;                       // 命令相关的表名
     table_t t;                              // 命令相关的表信息
     std::vector<string> selectedItems;      // select 语句中被选择的字段
     std::vector<string> selectedTable;      // select 语句中被选择的Table
-    std::map<string, string> insertItems;   // map of attribute name & value   
+    std::map<string, string> insertItems;   // map of attribute name & value while inserting
+    std::map<string, string> updateItems;   // map of attribute name & value while updating   
     ConditionTree * tree;                   // 条件树，用于 where 语句
 } Info_t;
 
@@ -71,6 +72,7 @@ public:
     void getCondition(std::vector<string> command, ConditionTree * condition);  // get condition tree
     Information_t getInfo();                                        // get the result after interpretion
 private:
+    /*--------------parse different types of commands------------------*/
     bool parseCommand();                                            // parse the input
     void parseInsert();
     void parseSelect();
@@ -78,8 +80,10 @@ private:
     void parseUpdate();
     void parseDelete();
     void parseQuit();
-    void parseHelp();
-    void parseDrop();
+    void parseHelp();           
+    void parseDrop();  
+    /*-----------------------------------------------------*/         
+    void clearInfo();           // clear all info before rewriting
     string input;                                                   // command input by user
     std::vector<string> command;                                    // parsed command 
     Info_t info;                                             // infomation interpreted by Interpreter
