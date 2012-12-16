@@ -14,9 +14,11 @@ all: minisql
 minisql: $(OBJS)
 	$(CXX) $(CPPFLAGS) -o minisql $(OBJS)
 
-minisql.o: minisql.cpp Buffer.h Catalog.h ConditionTree.h Definition.h Index.h Interpreter.h
+minisql.o: MiniSQL.cpp MiniSQL.h Catalog.h Index.h Interpreter.h
 catalog.o: Catalog.cpp Catalog.h
 interpreter.o: Interpreter.cpp Interpreter.h
+index.o: Index.cpp Index.h
+record.o: Record.cpp Record.h
 
 clean:
 	rm -f *~ *.o minisql
