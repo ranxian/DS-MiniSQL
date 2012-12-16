@@ -3,7 +3,6 @@
 # include <string>
 # include <map>
 # include <stack>
-#include "Table.h"
 #include "Catalog.h"
 #include "ConditionTree.h"
 /* 语法元素定义 */
