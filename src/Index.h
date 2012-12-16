@@ -13,6 +13,8 @@ typedef struct
     string value;       // 关键码
     void *basep;        // 内存中的基地址
     unsigned offset;    // basep 的偏移
+
+    index_node_t *nextNode
 } index_node_t;
 
 /* 索引头 */

@@ -1,5 +1,26 @@
 #include "Catalog.h"
 
+attr_t Catalog::findAttr(string tableName, string attrName)
+{
+
+}
+
+table_t findTable(string tableName)
+{
+    
+}
+
+void Catalog::create(table_t & table)
+{
+    string fileName = table.name + ".table";
+
+}
+
+void Catalog::delete(table_t & table)
+{
+
+}
+
 bool Catalog::tableExist(string tableName)
 {
     bool exist = false;
@@ -37,25 +58,12 @@ bool Catalog::attrTypeCheck()
 
 }
 
-pAttrInfo Catalog::findAttr()
+
+attr_t getPrimaryAttrName()
 {
 
 }
 
-pAttrInfo getPrimaryAttrName()
-{
-
-}
-
-void Catalog::create()
-{
-
-}
-
-void Catalog::delete()
-{
-
-}
 
 Catalog::Catalog()
 {

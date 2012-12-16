@@ -1,18 +1,18 @@
 #include "index.h"
 
-index_node_t *Index::select(attr_t attribute, string value)
+void Index::select(string indexName, string value, index_node_t *res)
 {
-    // 根据字段信息获得字段值的类型
-    bool isInt = 0;
-    if (attribute->type == INT)
-        isInt = 1;
-    else
-        isInt = 0;
-
     // 根据索引名找到索引文件中的索引头
     index_head_t idxHd;
     index_node_t curNode = idxHd.firstNode;
     // ...
+
+    // 根据索引头获得字段值的类型
+    bool isInt = 0;
+    if (idxHd->attr->type == INT)
+        isInt = 1;
+    else
+        isInt = 0;
 
     // 字段类型是整型
     if (isInt)
@@ -71,11 +71,13 @@ index_node_t *Index::select(attr_t attribute, string value)
     }
 }
 
-void Index::create(attr_t attribute)
+void Index::create(string indexName, attr_t & attr)
 {
     index_head_t idxHd = new index_head_t;
-    idxhd.attr = attribute;
+    idxhd.attr = attr;
     idxhd.firstNode = NULL;
+
+    
 }
 
 void Index::insert(attr_t attribute, string value)
