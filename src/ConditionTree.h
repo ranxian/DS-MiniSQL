@@ -22,4 +22,4 @@ struct ConditionTree
     string leftOperand;
     string rightOperand;
     bool end;
-}
+};
