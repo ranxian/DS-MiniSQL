@@ -1,5 +1,6 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
+
 #include "MiniSQL.h"
 using namespace std;
 

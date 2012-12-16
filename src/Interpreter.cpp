@@ -59,7 +59,6 @@ Info_t Interpreter::getInfo()
 
 void Interpreter::parseCreate() // OK
 {
-    clearInfo();
     int count = 0;
     int i = 4;
     int length = 0;
@@ -110,26 +109,22 @@ void Interpreter::parseCreate() // OK
 
 void Interpreter::parseHelp()   // OK
 {
-    clearInfo();
     info.command = HELP;
 }
 
 void Interpreter::parseQuit()   //OK
 {
-    clearInfo();
     info.command = QUIT;
 }
 
 void Interpreter::parseDrop()   //OK
 {
-    clearInfo();
     info.command = DROP_TABLE;
     info.tableName = command[2];
 }
 
 void Interpreter::parseSelect() //OK
 {
-    clearInfo();
     info.command = SELECT;
     int i = 1;
     while (command[i] != "from" && command[i] != "FROM")
@@ -151,7 +146,6 @@ void Interpreter::parseSelect() //OK
 
 void Interpreter::parseDelete() //OK
 {
-    clearInfo();
     info.command = DELETE;
     info.command = DELETE;
     info.tableName = command[2];
@@ -177,7 +171,6 @@ void Interpreter::clearInfo()
 
 void Interpreter::parseInsert()  //OK
 {
-    clearInfo();
     info.command = INSERT;
     info.tableName = command[2];
     int index1 = index2 = 4;
@@ -192,7 +185,6 @@ void Interpreter::parseInsert()  //OK
 
 void Interpreter::parseUpdate() //OK
 {
-    clearInfo();
     info.command = UPDATE;
     info.tableName = command[1];
     int index1 = 3;
