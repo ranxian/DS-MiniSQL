@@ -56,11 +56,11 @@ typedef struct
 /* 解析器解析命令后的结果 */
 typdef struct {
     cmd_t command;
-    string tableName;       // 命令相关的表名
-    tableInfo t;            // 命令相关的表信息
+    string tableName;                  // 命令相关的表名
+    table_t t;                         // 命令相关的表信息
     std::vector<string> selectedItems; // select 语句中被选择的字段
     std::vector<string> insertItems;   // insert 语句被更新的字段值
-    ConditionTree * tree;   // 条件树，用于 where 语句
+    ConditionTree * tree;              // 条件树，用于 where 语句
     // how to transfer insert infomation?? --zqm
 } Info_t;
 
