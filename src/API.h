@@ -5,8 +5,7 @@
 #include "Catalog.h"
 #include "Interpreter.h"
 #include "Record.h"
-#include "Index.h"
-
+class Index;
 class API
 {
 public:
