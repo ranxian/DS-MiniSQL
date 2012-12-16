@@ -64,7 +64,7 @@ typedef struct {
     std::map<string, string> insertItems;   // map of attribute name & value while inserting
     std::map<string, string> updateItems;   // map of attribute name & value while updating   
     condition_tree_t * tree;                   // 条件树，用于 where 语句
-} Info_t;
+} info_t;
 
 class Interpreter
 {

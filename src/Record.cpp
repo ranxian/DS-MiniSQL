@@ -9,107 +9,37 @@ totalLenth
 #include<iostream>
 using namespace std;
 
+/* 所有的文件的名字是表的名字后面加后缀.rec */
 
-filePtr Record::Insert(recInfo &a)
+/* Insert函数返回最后一条记录相对文件头的偏移量 */
+int Record::Insert(info_t & insert_info)
 {
-    cellInfo *temp = a.head;
-    filePtr insertPlace = findPlace();
-    void *ptr2write = (void *) insertPlace;
-    int *p = &(temp->value);
-    memWrite((void *)insertPlace, sizeof(filePtr), ptr2write);
-    ptr2write += sizeof(filePtr);
-    while (temp)
-    {
-        memWrite(p, temp->colLength, ptr2write);
-        switch (temp->colType)
-        {
-            case 'i':
-                ptr2write += temp->colLength;
-                break;
-            case 'c':
-                ptr2write += temp->colLength + 1;
-        }
-        temp = temp->next;
-    }
-    return insertPlace;
+
 }
 
-filePtr Record::findPlace()
+void Record::Delete(info_t & delete_info, index_node_t & index)
 {
-    if(firstDel == lastDel == 0)
-    {
-        switch(colType)
-        {
-            case 'i':
-                insertPlace = lastInsert + totalLenth + sizeof(filePtr);
-                break;
-            case 'c':
-                insertPlace = lastInsert + totalLenth + 1 + sizeof(filePtr);
-        }
-        insertPlace = lastInsert + totalLenth + sizeof(filePtr); 
 
-    }
-    else
-    {
-        insertPlace = firstDel;
-        firstDel = firstDel->filePtr;
-    }
-    return insertPlace;
 }
 
-void Record::Delete(fileAddr &delTarget)
+void Record::Update(info_t & update_info, index_node_t & index)
 {
-    filePtr *temp = (filePtr *)delTarget.changeToMem();
-    if (firstDel == lastDel == 0)
-    {
-        firstDel = temp;
-        temp->filePageId = 0;
-        temp->offset = 0;
 
-    }
-    else
-    {
-        filePtr *p1 = (filePtr *)lastDel.changeToMem();
-        filePtr *p1 = (filePtr *)delTarget.changeToMem();
-        *p1 = delTarget;
-        lastDel = delTarget;
-        p2->filePageId = 0;
-        p2->offset = 0;
-    }
+}
 
 
+record_t *Record::Select(info_t & select_info)
+{
+
+}
+
+void Record::Print(record_t *record)
+{
+
+}
+
+
+void Record::PrintHead(table_t & table)
+{
     
 }
-
-recInfo *Select(fileAddr &, selectRecInfo &) const
-{
-    recInfo *RPrecInfo = new recInfo;
-
-}
-
-void Record::Update(fileAddr& UpdateFAddr, recInfo& UpdateInfo)
-{
-    cellInfo* temp = UpdateInfo.head;
-    UpdateFAddr = filePtr->changeToMem();
-    int *i = &(temp->value);
-    while (temp)
-    {
-        memWrite(i, temp->colLength, sizeof(filePtr) + priorLength);
-        temp = temp->next;
-    }
-
-    fileAddr UFATemp = UpdateFAddr;
-    
-    UFATemp.ShiftOffset(sizeof (fileAddr));
-
-}
-
-void Record::Print(filePtr, recInfo &a)
-{
-    filePtr *temp = a.head;
-    
-}
-
-
-
-
