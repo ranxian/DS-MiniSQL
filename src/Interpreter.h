@@ -1,7 +1,6 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 # include <string>
-#include "Table.h"
 #include "Catalog.h"
 #include "ConditionTree.h"
 /* 语法元素定义 */
