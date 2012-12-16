@@ -56,26 +56,32 @@ typedef struct
 /* 解析器解析命令后的结果 */
 typdef struct {
     cmd_t command;
-    string tableName;                  // 命令相关的表名
-    table_t t;                         // 命令相关的表信息
-    std::vector<string> selectedItems; // select 语句中被选择的字段
-    std::vector<string> insertItems;   // insert 语句被更新的字段值
-    ConditionTree * tree;              // 条件树，用于 where 语句
-    // how to transfer insert infomation?? --zqm
+    string tableName;                       // 命令相关的表名
+    table_t t;                              // 命令相关的表信息
+    std::vector<string> selectedItems;      // select 语句中被选择的字段
+    std::vector<string> selectedTable;      // select 语句中被选择的Table
+    std::map<string, string> insertItems;   // map of attribute name & value   
+    ConditionTree * tree;                   // 条件树，用于 where 语句
 } Info_t;
 
 class Interpreter
 {
 public:
-    void inputCommand();
-    bool parseCommand();
-    void getCondition(std::vector<string> command, ConditionTree * condition);
-    int getCommandType();
-    Information_t getInfo();
+    void inputCommand();                                            // get command from STDIN
+    void getCondition(std::vector<string> command, ConditionTree * condition);  // get condition tree
+    Information_t getInfo();                                        // get the result after interpretion
 private:
-    int commandType;
-    string input;
-    std::vector<string> command;
-    Information_t info;
+    bool parseCommand();                                            // parse the input
+    void parseInsert();
+    void parseSelect();
+    void parseCreate();
+    void parseUpdate();
+    void parseDelete();
+    void parseQuit();
+    void parseHelp();
+    void parseDrop();
+    string input;                                                   // command input by user
+    std::vector<string> command;                                    // parsed command 
+    Info_t info;                                             // infomation interpreted by Interpreter
 };
 #endif
