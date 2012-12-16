@@ -1,36 +1,58 @@
 #include "Catalog.h"
 
-bool Catalog::tableExist(struct Information_t token)
+bool Catalog::tableExist(string tableName)
+{
+    bool exist = false;
+    ifstream fin;
+    fin.open(TABLE_LIST, ios::in);
+
+    char curTableName[MAX_FILENAME_LENGTH];   
+    string tableName;
+
+    while (!fin.eof())
+    {
+        fin.getline(curTableName, MAX_FILENAME_LENGTH);
+        if (curTableName == "" && fin.eof())
+        {
+            break;
+        }
+        if (curTableName == tableName)
+        {
+            exist = true;
+            break;
+        }
+    }
+
+    fin.close();
+    return exist;
+}
+
+bool Catalog::attrExist(string tableName, string attrName)
 {
 
 }
 
-bool Catalog::attrExist(struct Information_t token)
+bool Catalog::attrTypeCheck()
 {
 
 }
 
-bool Catalog::attrTypeCheck(struct Information_t token)
+pAttrInfo Catalog::findAttr()
 {
 
 }
 
-pAttrInfo Catalog::findAttr(struct Information_t token)
+pAttrInfo getPrimaryAttrName()
 {
 
 }
 
-pAttrInfo getPrimaryAttrName(struct Information_t token)
+void Catalog::create()
 {
 
 }
 
-void Catalog::create(struct Information_t token)
-{
-
-}
-
-void Catalog::delete(struct Information_t token)
+void Catalog::delete()
 {
 
 }

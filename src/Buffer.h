@@ -7,7 +7,6 @@ BUffer类的实现
 
 
 */
-#include "Definition.h"
  
 #include<iostream>
 using namespace std;

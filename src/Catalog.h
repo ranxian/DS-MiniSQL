@@ -4,6 +4,7 @@
 #include "Interpreter.h"
 
 /* 表与字段的结构 */
+/* 字段结构 */
 typedef struct {
     string name;        // 字段名
     bool isPrimary;     // 是否主键
@@ -26,19 +27,19 @@ typedef struct
 class Catalog
 {
 public:
-    bool tableExist(char *tableName);                           // 返回表是否存在
-    bool attrExist(struct Information_t token);                 // 返回字段是否存在
-    bool attrTypeCheck(struct Information_t token);             // 返回字段信息是否满足类型条件
+    attr_t findAttr();                // 返回要求的字段信息
 
-    pAttrInfo findAttr(struct Information_t token);             // 返回要求的字段信息
-    pAttrInfo getPrimaryAttrName(struct Information_t token);   // 返回主键的字段信息（然后去找索引）
-
-    void create(struct Information_t token);                    // 建表
-    void delete(struct Information_t token);                    // 删除表
+    void create();                    // 建表
+    void delete();                    // 删除表
 
     Catalog();
     ~Catalog();
 private:
+    bool tableExist(string tableName);   // 返回表是否存在
+    bool attrExist();                 // 返回字段是否存在
+    bool attrTypeCheck();             // 返回字段信息是否满足类型条件
+
+    attr_t getPrimaryAttrName();   // 返回主键的字段信息（然后去找索引）
 };
 
 #endif
