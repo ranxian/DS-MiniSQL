@@ -1,27 +1,44 @@
-// 存放 表的信息 的结构
-typedef struct *tableInfo pTableInfo;
-typedef struct
-{
-    char tableName[32];             // 表名，最长 32 位
-    int totalColumn;                // 字段数
-    int totalLenght;                // 一个记录占的字节数
+#ifndef CATALOG_H
+#define CATALOG_H
 
-    pColumnInfo primaryKey;         // 指向主键的指针
-} tableInfo;
+#include "Interpreter.h"
 
-// 字段的类型
-typedef enum {
-    INT,
-    CHAR
-} columnType;
+/* 表与字段的结构 */
+typedef struct {
+    string name;        // 字段名
+    bool isPrimary;     // 是否主键
+    int length;         // 字段占字节数
+    attrtype_t type;    // 类型（CHAR, INT）
+    // bool isUnique;
+} attr_t;
 
-// 存放 字段的信息 的结构
-typedef struct *columnInfo pColumnInfo;
+/* 表的结构 */
 typedef struct 
 {
-    char columnName[32];            // 字段名，最长 32 位
-    int isPrimary;                  // 是否主键
-    columnType colType;             // 字段类型，int/char
-    int colLength;                  // 字段占的字节数
-    pColumnInfo next;               // 指向下一个字段的指针
-} columnInfo;
+    string name;        // 表名
+    int attrNumber;     // 字段数
+    int recordLength;   // 一条记录的字节数
+    attr_t attributes[MAX_ATTR_NUM];    //字段
+} table_t;
+
+/***********************************************************/
+
+class Catalog
+{
+public:
+    bool tableExist(char *tableName);                           // 返回表是否存在
+    bool attrExist(struct Information_t token);                 // 返回字段是否存在
+    bool attrTypeCheck(struct Information_t token);             // 返回字段信息是否满足类型条件
+
+    pAttrInfo findAttr(struct Information_t token);             // 返回要求的字段信息
+    pAttrInfo getPrimaryAttrName(struct Information_t token);   // 返回主键的字段信息（然后去找索引）
+
+    void create(struct Information_t token);                    // 建表
+    void delete(struct Information_t token);                    // 删除表
+
+    Catalog();
+    ~Catalog();
+private:
+};
+
+#endif
