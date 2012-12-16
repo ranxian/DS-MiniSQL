@@ -34,7 +34,7 @@ void Interpreter::parseCommand()
         }
     }
 
-    if (command[0] == "create" || commandp[0] == "CRERATE")
+    if (command[0] == "create" || command[0] == "CRERATE")
         parseCreate();
     else if (command[0] == "select" || command[0] == "SELECT")
         parseSelect();
@@ -127,7 +127,7 @@ void Interpreter::parseDrop()   //OK
     info.tableName = command[2];
 }
 
-void Interpreter::parseSelect() //!
+void Interpreter::parseSelect() //OK
 {
     clearInfo();
     info.command = SELECT;
@@ -145,11 +145,11 @@ void Interpreter::parseSelect() //!
     }
     if (command[i] == "where" || command[i] == "WHERE")
     {
-        // build condition tree
+        info.tree = makeTree(i+1);
     }
 }
 
-void Interpreter::parseDelete() //!
+void Interpreter::parseDelete() //OK
 {
     clearInfo();
     info.command = DELETE;
@@ -161,7 +161,7 @@ void Interpreter::parseDelete() //!
     }
     else
     {
-        // build condition tree
+        info.tree = makeTree(4);
     }
 }
 
@@ -190,7 +190,7 @@ void Interpreter::parseInsert()  //OK
     }
 }
 
-void Interpreter::parseUpdate() //!
+void Interpreter::parseUpdate() //OK
 {
     clearInfo();
     info.command = UPDATE;
@@ -202,9 +202,74 @@ void Interpreter::parseUpdate() //!
     {
         if (command[6] == "where" || command[6] == "WHERE")
         {
-            // build tree
+            info.tree = makeTree(7);
         }
     }
 
+}
+
+condition_tree_t * makeTree(int index)
+{
+    std::stack<condition_tree_t *> atom;
+    std::stack<condition_tree_t *> logic;
+    condition_tree_t * ptr;
+    int i,j,k;
+    i = index;
+    while (i < command.size())
+    {
+        ptr = new condition_tree_t();
+        if (command[i] == "AND" || command[i] == "and")
+        {
+            ptr->logic = AND;
+            ptr->end = false;
+            logic.push(ptr);
+            i++
+        }
+        else if (command[i] == "OR" || command[i] == "or")
+        {
+            ptr->logic = OR;
+            ptr->end = false;
+            logic.push(ptr);
+            i++
+        }
+        else
+        {
+            ptr->leftOperand = command[i];
+            i++;
+            if (command[i] == "==")
+                ptr->opName = EQ;
+            else if (command[i] == "<>")
+                ptr->opName = NE;
+            else if (command[i] == ">")
+                ptr->opName = GT;
+            else if (command[i] == "<")
+                ptr->opName = LT;
+            else if (command[i] == ">=")
+                ptr->opName = GTE;
+            else if (command[i] == "<=")
+                ptr->opName = LTE;
+            i++;
+            ptr->rightOperand = command[i];
+            ptr->end = true;
+            atom.push(ptr);
+            i++;
+        }
+    }
+    condition_tree_t * ptr1, ptr2;
+    while (logic.size())
+    {
+        ptr = logic.top();
+        logic.pop();
+        ptr1 = atom.top();
+        atom.pop();
+        ptr2 = atom.top();
+        atom.pop();
+        ptr->left = ptr1;
+        ptr->right = ptr2;
+        atom.push(ptr);
+    }
+    ptr = atom.top();
+    atom.pop();
+    return ptr;
 }
 

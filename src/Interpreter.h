@@ -1,6 +1,8 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 # include <string>
+# include <map>
+# include <stack>
 #include "Table.h"
 #include "Catalog.h"
 #include "ConditionTree.h"
@@ -62,7 +64,7 @@ typedef struct {
     std::vector<string> selectedTable;      // select 语句中被选择的Table
     std::map<string, string> insertItems;   // map of attribute name & value while inserting
     std::map<string, string> updateItems;   // map of attribute name & value while updating   
-    ConditionTree * tree;                   // 条件树，用于 where 语句
+    condition_tree_t * tree;                   // 条件树，用于 where 语句
 } Info_t;
 
 class Interpreter
@@ -86,6 +88,7 @@ private:
     void clearInfo();           // clear all info before rewriting
     string input;                                                   // command input by user
     std::vector<string> command;                                    // parsed command 
-    Info_t info;                                             // infomation interpreted by Interpreter
+    Info_t info;                // infomation interpreted by Interpreter
+    condition_tree_t * makeTree(int index);
 };
 #endif
