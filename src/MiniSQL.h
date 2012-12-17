@@ -117,14 +117,16 @@ struct index_node_t
     void *basep;        // 内存中的基地址
     unsigned offset;    // basep 的偏移
 
-    index_node_t *nextNode;
+    // index_node_t *nextNode;
 };
 
 /* 索引头 */
 struct index_head_t
 {
-    attr_t attr;            // 做索引的字段
-    index_node_t *firstNode; // 指向第一个索引
+    attr_t attr;                // 做索引的字段
+    int recNum;            // 记录数目
+
+    index_node_t *firstNode;    // 指向第一个索引
 };
 
 struct record_t

@@ -14,19 +14,23 @@ class Index
 {
 public:
     // 查找关键码为 value 的索引项
-    void select(string indexName, string value, index_node_t *res);
+    void select(string tableName, string indexName, string value, index_node_t *res);
     // 建立索引
-    void create(string indexName, attr_t & attr);                           
+    void create(string tableName, string indexName, attr_t & attr);                           
     // 插入关键码为 value 的新索引项
-    void insert(string indexName, index_node_t node);
+    void insert(string tableName, string indexName, index_node_t node);
     // 删除关键码为 value 的索引项
-    void deleteIndex(string indexName, string value);                           
+    void deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
-    void update(string indexName, string value, string newValue);          
+    void update(string tableName, string indexName, string value, string newValue);          
     Index();
     ~Index();
 private:
-    index_node_t searchResult;
+    inline bool lessThan(string value_1, string value_2, attrtype_t type);
+    inline void readHead(ifstream & fin, index_head_t & head);
+    inline void writeHead(ofstream & fout, index_head_t & head);
+    inline void readNode(ifstream & fin, index_node_t & node);
+    inline void writeNode(ofstream & fout, index_node_t & node);
 };
 
 #endif

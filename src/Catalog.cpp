@@ -13,7 +13,7 @@ table_t findTable(string tableName)
 void Catalog::createTable(table_t & table)
 {
     ofstream fout;
-    fout.open("table.info", ios::app);
+    fout.open("../data/table.info", ios::app);
 
     // 这是一个表的开头
     fout << "*\n";

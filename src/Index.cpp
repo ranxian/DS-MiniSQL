@@ -1,347 +1,154 @@
 #include "index.h"
 
-void Index::select(string indexName, string value, index_node_t *res)
+void Index::select(string tableName, string indexName, string value, index_node_t *res)
 {
-    // 根据索引名找到索引文件中的索引头
-    index_head_t idxHd;
-    index_node_t curNode = idxHd.firstNode;
-    // ...
-
-    // 根据索引头获得字段值的类型
-    bool isInt = 0;
-    if (idxHd->attr->type == INT)
-        isInt = 1;
-    else
-        isInt = 0;
-
-    // 字段类型是整型
-    if (isInt)
-    {
-        int iValue = atoi(value.c_str());
-        int curValue = atoi(curNode.value.c_str()); 
-
-        // 查找该索引项
-        while (curNode != NULL)
-        {
-            curValue = atoi(curNode.value.c_str());
-
-            // 找到了要提取的索引项
-            if (curValue == iValue)
-            {
-                selectResult.basep = curNode.basep;
-                selectResult.offset = curNode.offset;
-                return &selectResult;
-            }
-            curNode = curNode.nextNode;
-        }
-
-        // 没有找到该索引项
-        if (curNode == NULL)
-        {
-            // 报错
-        }
-
-    }
-    // 字段类型是字符串
-    else
-    {
-        string curValue = curNode.value; 
-
-        // 查找该索引项
-        while (curNode != NULL)
-        {
-            curValue = curNode.value;
-
-            // 找到了要提取的索引项
-            if (curValue == value)
-            {
-                selectResult.basep = curNode.basep;
-                selectResult.offset = curNode.offset;
-                return &selectResult;
-            }
-
-            curNode = curNode.nextNode;
-        }
-
-        // 没有找到该索引项
-        if (curNode == NULL)
-        {
-            // 报错
-        }
-    }
-}
-
-void Index::create(string indexName, attr_t & attr)
-{
-    index_head_t idxHd = new index_head_t;
-    idxhd.attr = attr;
-    idxhd.firstNode = NULL;
-
     
 }
 
-void Index::insert(attr_t attribute, string value)
+void Index::create(string tableName, string indexName, attr_t & attr)
 {
-    // 根据字段信息获得字段值的类型
-    bool isInt = 0;
-    if (attribute->type == INT)
-        isInt = 1;
-    else
-        isInt = 0;
+    index_head_t *idxHd = new index_head_t;
+    idxHd->attr = attr;
+    idxHd->recNum = 0;
+    idxHd->firstNode = NULL;
 
-    // 根据 Record 的信息获得 页号 和 页偏移
-    void *basep;
-    unsigned offset;
-    // ...
+    string file = "../data/" + tableName + "_" + indexName + ".idx";
+    ofstream fout;
+    fout.open(file.c_str(), ios::out | ios::app);
 
-    // 建立新索引项
-    index_node_t idxNode = new index_node_t;
-    memcpy(idxNode.value, value, strlen(value));
-    idxNode.basep = basep;
-    idxNode.offset = offset;
-    idxNode.nextNode = NULL;
+    // 将索引头信息写到索引文件
+    writeHead(fout, *idxHd);
 
-    // 根据索引名找到索引文件中的索引头
-    index_head_t idxHd;
-    // ...
+    fout.close();
+}
 
-    // 若索引还是空的，那么就创建第一个索引
-    if (idxHd.firstNode == NULL)
+void Index::insert(string tableName, string indexName, index_node_t node)
+{
+    ifstream fin;
+    ofstream fout;
+    index_head_t *idxHd = new index_head_t;
+
+    // 根据索引名找到索引文件
+    string file = "../data/" + tableName + "_" + indexName + ".idx";
+    fin.open(file.c_str(), ios::in | ios::binary);
+
+    // 读出索引头
+    readHead(fin, *idxHd);
+    attrtype_t type = idxHd->attr->type;
+    int recNum = idxHd->recNum;
+
+    // 更新索引头的记录数目
+    idxHd->recNum++;
+
+    // 写入索引头
+    writeHead(fout, *idxHd);
+
+    // 若插入之前记录数为 0，直接插入
+    if (recNum == 0)
     {
-        idxHd.firstNode = idxNode;
-        return;
+        writeNode(fout, node);
     }
 
-    // 若索引不是空的，那么就找到合适的地方插入
-    if (idxHd.firstNode != NULL)
+    // 若插入之前当前已存在记录，将记录全部读出再插入
+    else
     {
-        index_node_t curNode = idxHd.firstNode;
-        // 字段类型是整型
-        if (isInt)
+        // 存放读出来的记录
+        index_node_t idxNode[idxHd->recNum];
+        // 读出记录
+        for (int i = 0; i < recNum; i++)
         {
-            int iValue = atoi(value.c_str());
-            int curValue = atoi(curNode.value.c_str()); 
+            readNode(fin, idxNode[i]);
+        }
 
-            // 已有相同值，无法插入
-            if (curValue == iValue)
+        // 查找合适的插入位置
+        bool atLast = true; // 判断是否要插到文件最后
+        int pos = 0;        // 插入的位置
+        for (int i = 0; i < recNum - 1; i++)
+        {
+            // 满足该条件时插到 i 和 i + 1 之间
+            if (lessThan(idxNode[i].value, node.value, type) &&
+                lessThan(idxNode[i + 1].value, node.value, type))
             {
-                return;
-            }
-
-            // 第一个索引项比插入索引项大，插入索引项变为第一项
-            if (curValue > iValue)
-            {
-                idxHd.firstNode = idxNode;
-                idxNode.nextNode = curNode;
-                return;
-            }
-
-            // 第一个索引项比插入索引项小，普通情况
-            while (curValue < iValue)
-            {
-                // 插到最后
-                if (curNode.nextNode == NULL)
-                {
-                    curNode.nextNode = idxNode;
-                    return;
-                }
-
-                // 插到中间
-                else if (atoi(curNode.nextNode.value.c_str()) > iValue)
-                {
-                    index_node_t nextNode = curNode.nextNode;
-                    curNode.nextNode = idxNode;
-                    idxNode.nextNode = nextNode;
-                    return;
-                }
-
-                curNode = curNode.nextNode;
-                curValue = atoi(curNode.value.c_str());
+                atLast = false;
+                pos = i;
+                break;
             }
         }
-        // 字段类型是字符串
+
+        // 应该插到最后
+        if (atLast)
+        {
+            // 改从文件尾写入的方式
+            fout.close();
+            fout.open(file.c_str(), ios::out | ios::app);
+
+            writeNode(fout, node);
+        }
+
+        // 应该插到 pos 后
         else
         {
-            string curValue = curNode.value;
-
-            // 已有相同值，无法插入
-            if (curValue == value)
+            // 将插入项之前的索引项一条条写入
+            for (int i = 0; i <= pos; i++)
             {
-                return;
+                writeNode(fout, idxNode[i]);
             }
 
-            // 第一个索引项比插入索引项大，插入索引项变为第一项
-            if (curValue > value)
+            // 写入插入项
+            writeNode(fout, node);
+
+            // 将插入项之后的索引项一条条写入
+            for (int i = pos + 1; i < recNum; i++)
             {
-                idxHd.firstNode = idxNode;
-                idxNode.nextNode = curNode;
-                return;
-            }
-
-            // 第一个索引项比插入索引项小，普通情况
-            while (curValue < value)
-            {
-                // 插到最后
-                if (curNode.nextNode == NULL)
-                {
-                    curNode.nextNode = idxNode;
-                    return;
-                }
-
-                // 插到中间
-                else if (curNode.nextNode.value > curValue)
-                {
-                    index_node_t nextNode = curNode.nextNode;
-                    curNode.nextNode = idxNode;
-                    idxNode.nextNode = nextNode;
-                    return;
-                }
-
-                curNode = curNode.nextNode;
-                curValue = curNode.value;
+                writeNode(fout, idxNode[i]);
             }
         }
     }
+
+    fin.close();
+    fout.close();
 }
 
-void Index::deleteIndex(attr_t attribute, string value)
+void Index::deleteIndex(string tableName, attr_t attribute, string value)
 {
-    // 根据字段信息获得字段值的类型
-    bool isInt = 0;
-    if (attrInfo->type == INT)
-        isInt = 1;
-    else
-        isInt = 0;
-
-    // 根据索引名找到索引文件中的索引头
-    index_head_t idxHd;
-    // ...
-    index_node_t curNode = idxHd.firstNode;
-
-    // 字段类型是整型
-    if (isInt)
-    {
-        int iValue = atoi(value.c_str());
-        int curValue = atoi(curNode.value.c_str()); 
-
-        // 第一项即该索引项，删除之
-        if (curValue == iValue)
-        {
-            index_node_t nextNode = curNode.nextNode;
-            idxHd.firstNode = nextNode;
-            delete curNode;
-            return;
-        }
-
-        // 否则查找该索引项
-        while (true)
-        {
-            // 如果下一个索引项是要找的索引项
-            if (atoi(curNode.nextNode.value.c_str()) == iValue)
-            {
-                index_node_t prevNode = curNode;
-                index_node_t curNode = curNode.nextNode;
-                index_node_t nextNode = curNode.nextNode;
-
-                delete curNode;
-                prevNode.nextNode = nextNode;
-                return;
-            }
-
-            curNode = curNode.nextNode;
-            curValue = atoi(curNode.value.c_str());
-        }
-    }
-    // 字段类型是字符串
-    else
-    {
-        string curValue = curNode.value; 
-
-        // 第一项即该索引项，删除之
-        if (curValue == value)
-        {
-            index_node_t nextNode = curNode.nextNode;
-            idxHd.firstNode = nextNode;
-            delete curNode;
-            return;
-        }
-
-        // 否则查找该索引项
-        while (true)
-        {
-            // 如果下一个索引项是要找的索引项
-            if (curNode.nextNode.value == value)
-            {
-                index_node_t prevNode = curNode;
-                index_node_t curNode = curNode.nextNode;
-                index_node_t nextNode = curNode.nextNode;
-
-                delete curNode;
-                prevNode.nextNode = nextNode;
-                return;
-            }
-
-            curNode = curNode.nextNode;
-            curValue = curNode.value;
-        }
-    }
+ 
 }
 
-void Index::update(attr_t attribute, string value, string newValue)
+void Index::update(string tableName, string indexName, string value, string newValue)
 {
-    // 根据字段信息获得字段值的类型
-    bool isInt = 0;
-    if (attrInfo->type == INT)
-        isInt = 1;
-    else
-        isInt = 0;
 
-    // 根据索引名找到索引文件中的索引头
-    index_head_t idxHd;
-    // ...
-    index_node_t curNode = idxHd.firstNode;
+}
 
-    // 字段类型是整型
-    if (isInt)
-    {
-        int iValue = atoi(value.c_str());
-        int curValue = atoi(curNode.value.c_str()); 
+bool lessThan(string value_1, string value_2, attrtype_t type)
+{
 
-        // 查找该索引项
-        while (true)
-        {
-            // 找到了要更新的索引项
-            if (curValue == iValue)
-            {
-                memset(curNode.value, 0, strlen(curNode.value));
-                memcpy(curNode.value, newValue, strlen(newValue));
-                return;
-            }
+}
 
-            curNode = curNode.nextNode;
-            curValue = atoi(curNode.value.c_str());
-        }
-    }
-    // 字段类型是字符串
-    else
-    {
-        string curValue = curNode.value; 
+void readHead(ifstream & fin, index_head_t & head)
+{
+    fin.read((char *)&head, sizeof(index_head_t));
+}
 
-        // 查找该索引项
-        while (true)
-        {
-            // 找到了要更新的索引项
-            if (curValue == value)
-            {
-                memset(curNode.value, 0, strlen(curNode.value));
-                memcpy(curNode.value, newValue, strlen(newValue));
-                return;
-            }
+void writeHead(ofstream & fout, index_head_t & head)
+{
+    fout.write((char *)&head, sizeof(index_head_t));
+}
 
-            curNode = curNode.nextNode;
-            curValue = curNode.value;
-        }
-    }
+void readNode(ifstream & fin, index_node_t & node)
+{
+    char buf[MAX_CHAR_LENGTH];
+    fin.read((char *)buf, MAX_CHAR_LENGTH);
+    fin.read((char *)&(node.basep), sizeof(void *));
+    fin.read((char *)&(node.offset), sizeof(unsigned));
+    node.value = buf;
+}
+void writeNode(ofstream & fout, index_node_t & node)
+{
+    char buf[MAX_CHAR_LENGTH];
+    node->value.copy(buf, MAX_CHAR_LENGTH);
+    fout.write((char *)buf, MAX_CHAR_LENGTH);
+    fout.write((char *)&(node.basep), sizeof(void *));
+    fout.write((char *)&(node.offset), sizeof(unsigned));
 }
 
 Index::Index()
