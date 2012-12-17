@@ -13,29 +13,9 @@ table_t findTable(string tableName)
 void Catalog::createTable(table_t & table)
 {
     ofstream fout;
-    fout.open("../data/table.info", ios::app);
+    fout.open(TABLE_LIST, ios::out | ios::app);
 
-    // 这是一个表的开头
-    fout << "*\n";
-    // 表名
-    fout << table.name << " ";
-    // 一条记录的字节数
-    fout << table.recordLength << " ";
-    // 字段数
-    fout << table.attrNumber << "\n";
-    // 每个字段
-    for (int i = 0; i < table.attrNumber; i++)
-    {
-        attr_t attr = table.attributes[i];
-        // 字段名
-        fout << attr.name << " ";
-        // 字段是否是主键
-        fout << attr.isPrimary << " ";
-        // 字段占字节数
-        fout << attr.length << " ";
-        // 字段类型
-        fout << attr.type << "\n";
-    }
+    writeTable(fout, table);
 
     fout.close();
 }
@@ -48,19 +28,16 @@ void Catalog::deleteTable(table_t & table)
 bool Catalog::tableExist(string tableName)
 {
     bool exist = false;
+    table_t tmpTable;
+    
     ifstream fin;
     fin.open(TABLE_LIST, ios::in);
 
-    char curTableName[MAX_FILENAME_LENGTH];   
-
     while (!fin.eof())
     {
-        fin.getline(curTableName, MAX_FILENAME_LENGTH);
-        if (curTableName == "" && fin.eof())
-        {
-            break;
-        }
-        if (curTableName == tableName)
+        readTable(fin, tmpTable);
+
+        if (tmpTable.name == tableName)
         {
             exist = true;
             break;
@@ -68,6 +45,7 @@ bool Catalog::tableExist(string tableName)
     }
 
     fin.close();
+
     return exist;
 }
 
@@ -87,6 +65,53 @@ attr_t getPrimaryAttrName()
 
 }
 
+void writeTable(ofstream & fout, table_t & table)
+{
+    char buf[MAX_CHAR_LENGTH];
+    table.name.copy(buf, MAX_CHAR_LENGTH);
+    fout.write((char *)buf, MAX_CHAR_LENGTH);
+    fout.write((char *)&(table.attrNumber), sizeof(int));
+    fout.write((char *)&(table.recordLength), sizeof(int));
+
+    for (int i = 0; i < table.attrNumber; i++)
+    {
+        writeAttr(fout, table.attributes[i]);
+    }
+}
+
+void readTable(ifstream & fin, table_t & table)
+{
+    char buf[MAX_CHAR_LENGTH];
+    fin.read((char *)buf, MAX_CHAR_LENGTH);
+    fin.read((char *)&(table.attrNumber), sizeof(int));
+    fin.read((char *)&(table.recordLength), sizeof(int));
+    table.name = buf;
+
+    for (int i = 0; i < table.attrNumber; i++)
+    {
+        readAttr(fin, table.attributes[i]);
+    }
+}
+
+void writeAttr(ofstream & fout, attr_t & attr)
+{
+    char buf[MAX_CHAR_LENGTH];
+    attr.name.copy(buf, MAX_CHAR_LENGTH);
+    fout.write((char *)buf, MAX_CHAR_LENGTH);
+    fout.write((char *)&(attr.isPrimary), sizeof(bool));
+    fout.write((char *)&(attr.length), sizeof(int));
+    fout.write((char *)&(attr.type), sizeof(attrtype_t));
+}
+
+void readAttr(ifstream & fin, attr_t & attr)
+{
+    char buf[MAX_CHAR_LENGTH];
+    fin.read((char *)buf, MAX_CHAR_LENGTH);
+    fin.read((char *)&(attr.isPrimary), sizeof(bool));
+    fin.read((char *)&(attr.length), sizeof(int));
+    fin.read((char *)&(attr.type), sizeof(attrtype_t));
+    attr.name = buf;
+}
 
 Catalog::Catalog()
 {

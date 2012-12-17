@@ -145,7 +145,7 @@ void readNode(ifstream & fin, index_node_t & node)
 void writeNode(ofstream & fout, index_node_t & node)
 {
     char buf[MAX_CHAR_LENGTH];
-    node->value.copy(buf, MAX_CHAR_LENGTH);
+    node.value.copy(buf, MAX_CHAR_LENGTH);
     fout.write((char *)buf, MAX_CHAR_LENGTH);
     fout.write((char *)&(node.basep), sizeof(void *));
     fout.write((char *)&(node.offset), sizeof(unsigned));

@@ -21,6 +21,11 @@ private:
     bool attrTypeCheck();                // 返回字段信息是否满足类型条件
 
     attr_t getPrimaryAttrName();   // 返回主键的字段信息（然后去找索引）
+
+    inline void writeTable(ofstream & fout, table_t & table);
+    inline void readTable(ifstream & fin, table_t & table);
+    inline void writeAttr(ofstream & fout, attr_t & attr);
+    inline void readAttr(ifstream & fin, attr_t & attr);
 };
 
 #endif
