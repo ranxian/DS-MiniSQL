@@ -27,10 +27,11 @@ void Catalog::deleteTable(table_t & table)
 
 bool Catalog::tableExist(string tableName)
 {
+    ifstream fin;
+
     bool exist = false;
     table_t tmpTable;
 
-    ifstream fin;
     fin.open(TABLE_LIST, ios::in);
 
     while (!fin.eof())

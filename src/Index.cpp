@@ -211,8 +211,8 @@ void Index::update(string tableName, string indexName, string value, string newV
 
             // 将更新了的索引项写回文件
             // 先将写指针放到正确位置
-            fout.seekp(fin.tellg() - NODE_SIZE_IN_FILE);
-            writeNode(curIdxNode);
+            fout.seekp((int)fin.tellg() - (int)IDXNODE_SIZE_IN_FILE);
+            writeNode(fout, curIdxNode);
 
             break;
         }
@@ -222,13 +222,13 @@ void Index::update(string tableName, string indexName, string value, string newV
     fout.close();
 }
 
-bool lessThan(string value_1, string value_2, attrtype_t type)
+bool Index::lessThan(string value_1, string value_2, attrtype_t type)
 {
     // 类型为 INT 时转化为 int 比较
     if (type == INT)
     {
-        int iValue_1 = atoi(value_1);
-        int iValue_2 = atoi(value_2);
+        int iValue_1 = atoi(value_1.c_str());
+        int iValue_2 = atoi(value_2.c_str());
         return (iValue_1 < iValue_2);
     }
 
@@ -239,18 +239,18 @@ bool lessThan(string value_1, string value_2, attrtype_t type)
     }
 }
 
-void readHead(ifstream & fin, index_head_t & head)
+void Index::readHead(ifstream & fin, index_head_t & head)
 {
     fin.read((char *)&head, sizeof(index_head_t));
 }
 
-void writeHead(ofstream & fout, index_head_t & head)
+void Index::writeHead(ofstream & fout, index_head_t & head)
 {
     fout.write((char *)&head, sizeof(index_head_t));
     fout.flush();
 }
 
-void readNode(ifstream & fin, index_node_t & node)
+void Index::readNode(ifstream & fin, index_node_t & node)
 {
     char buf[MAX_CHAR_LENGTH];
     fin.read((char *)buf, MAX_CHAR_LENGTH);
@@ -258,7 +258,7 @@ void readNode(ifstream & fin, index_node_t & node)
     fin.read((char *)&(node.offset), sizeof(unsigned));
     node.value = buf;
 }
-void writeNode(ofstream & fout, index_node_t & node)
+void Index::writeNode(ofstream & fout, index_node_t & node)
 {
     fout.write((char *)node.value.c_str(), MAX_CHAR_LENGTH);
     // fout.write((char *)&(node.basep), sizeof(void *));
