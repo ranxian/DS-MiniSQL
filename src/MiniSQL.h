@@ -21,7 +21,7 @@ using namespace std;
 #define MAX_ATTRNAME_LENGTH 256     /* 最长字段长度 */
 #define MAX_RECORD_LENGTH   256     /* 最长记录长度 */
 #define MAX_ATTR_NUM        32      /* 一个表的最长字段数目 */
-#define TABLE_LIST "table.list"     /* 保存表信息的文件 */
+#define TABLE_LIST "../data/table.list"     /* 保存表信息的文件 */
 #define INDEX_LIST "index.list"     /* 保存索引信息的文件 */
 #define FILE_PAGESIZE 4096          /* 虚拟页大小 */
 #define MEM_MAXPAGE 1000            /* 内存页最大数目 */
@@ -114,7 +114,7 @@ struct info_t {
 struct index_node_t 
 {
     string value;       // 关键码
-    void *basep;        // 内存中的基地址
+    // void *basep;        // 内存中的基地址
     unsigned offset;    // basep 的偏移
 
     // index_node_t *nextNode;
@@ -126,7 +126,7 @@ struct index_head_t
     attr_t attr;                // 做索引的字段
     int recNum;            // 记录数目
 
-    index_node_t *firstNode;    // 指向第一个索引
+    // index_node_t *firstNode;    // 指向第一个索引
 };
 
 struct record_t
