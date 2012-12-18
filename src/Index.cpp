@@ -6,7 +6,7 @@ void Index::select(string tableName, string indexName, string value, index_node_
 
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
-    fin.open(file.c_str(), ios::in);
+    fin.open(file.c_str(), ios::in | ios::binary);
 
     // 读出索引头
     index_head_t idxHd;
@@ -38,7 +38,7 @@ void Index::create(string tableName, string indexName, attr_t & attr)
 
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
-    fout.open(file.c_str(), ios::out);
+    fout.open(file.c_str(), ios::out | ios::binary);
 
     // 将索引头信息写到索引文件
     index_head_t idxHd;
@@ -56,7 +56,7 @@ void Index::insert(string tableName, string indexName, index_node_t node)
 
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
-    fin.open(file.c_str(), ios::in);
+    fin.open(file.c_str(), ios::in | ios::binary);
 
     // 读出索引头
     index_head_t idxHd;
@@ -64,24 +64,24 @@ void Index::insert(string tableName, string indexName, index_node_t node)
     attrtype_t type = idxHd.attr.type;
     int recNum = idxHd.recNum;  // 注意：是插入该索引项之前的索引项数目
 
-    // 更新索引头的记录数目
+    // 更新索引头的索引项数目
     idxHd.recNum++;
 
     // 写入索引头
     writeHead(fout, idxHd);
 
-    // 若插入之前记录数为 0，直接插入
+    // 若插入之前索引项数为 0，直接插入
     if (recNum == 0)
     {
         writeNode(fout, node);
     }
 
-    // 若插入之前当前已存在记录，将记录全部读出再插入
+    // 若插入之前当前已存在索引项，将记录全部读出再插入
     else
     {
-        // 存放读出来的记录
-        index_node_t idxNode[recNum];
-        // 读出记录
+        // 存放读出来的索引项
+        index_node_t *idxNode = new index_node_t[recNum];
+        // 读出索引项
         for (int i = 0; i < recNum; i++)
         {
             readNode(fin, idxNode[i]);
@@ -107,7 +107,7 @@ void Index::insert(string tableName, string indexName, index_node_t node)
         {
             // 改从文件尾写入的方式
             fout.close();
-            fout.open(file.c_str(), ios::out | ios::app);
+            fout.open(file.c_str(), ios::out | ios::app | ios::binary);
 
             writeNode(fout, node);
         }
@@ -115,11 +115,10 @@ void Index::insert(string tableName, string indexName, index_node_t node)
         // 应该插到 pos 后
         else
         {
-            // 将插入项之前的索引项一条条写入
-            for (int i = 0; i <= pos; i++)
-            {
-                writeNode(fout, idxNode[i]);
-            }
+            // 把写指针移动到写入新索引项的位置 即（索引头 + pos 个索引项之后）
+            // 指针的当前位置是索引头后面 故向后偏移 pos 个索引项的大小
+            int offset = pos * IDXNODE_SIZE_IN_FILE;
+            fout.seekp(offset, ios::cur);
 
             // 写入插入项
             writeNode(fout, node);
@@ -130,15 +129,59 @@ void Index::insert(string tableName, string indexName, index_node_t node)
                 writeNode(fout, idxNode[i]);
             }
         }
+
+        // 回收内存
+        delete [] idxNode;
     }
 
     fin.close();
     fout.close();
 }
 
-void Index::deleteIndex(string tableName, attr_t attribute, string value)
+void Index::deleteIndex(string tableName, string indexName, string value)
 {
- 
+    ifstream fin;
+    ofstream fout;
+
+    // 根据索引名找到索引文件
+    string file = "../data/" + tableName + "_" + indexName + ".idx";
+    fin.open(file.c_str(), ios::in | ios::binary);
+
+    // 读出索引头
+    index_head_t idxHd;
+    readHead(fin, idxHd);
+    int recNum = idxHd.recNum;
+
+    // 查找索引
+    for (int i = 0; i < idxHd.recNum; i++)
+    {
+        index_node_t curIdxNode;
+        readNode(fin, curIdxNode);
+
+        // 存放读出来的索引项
+        index_node_t *idxNode = new index_node_t[recNum];
+        // 读出索引项 并 找到要删除的索引项
+        int pos;    // 第 pos 个索引项是要删除的索引项
+        for (int i = 0; i < recNum; i++)
+        {
+            readNode(fin, idxNode[i]);
+            if (idxNode[i].value == value)
+            {
+                pos = i;
+            }
+        }
+
+        // 将写指针放到第 pos 个索引项的开头
+        // 写第 pos + 1 及其后面的所有索引项
+        fout.seekp(IDXHEAD_SIZE_IN_FILE + (pos - 1) * IDXNODE_SIZE_IN_FILE);
+        for (int i = pos + 1; i < recNum; i++)
+        {
+            writeNode(fout, idxNode[i]);
+        }
+    }
+
+    fin.close();
+    fout.close();
 }
 
 void Index::update(string tableName, string indexName, string value, string newValue)
@@ -148,7 +191,7 @@ void Index::update(string tableName, string indexName, string value, string newV
 
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
-    fin.open(file.c_str(), ios::in);
+    fin.open(file.c_str(), ios::in | ios::binary);
 
     // 读出索引头
     index_head_t idxHd;
@@ -163,6 +206,13 @@ void Index::update(string tableName, string indexName, string value, string newV
         // 找到了要求索引项
         if (curIdxNode.value == value)
         {
+            // 更新索引项的关键码值
+            curIdxNode.value = newValue;
+
+            // 将更新了的索引项写回文件
+            // 先将写指针放到正确位置
+            fout.seekp(fin.tellg() - NODE_SIZE_IN_FILE);
+            writeNode(curIdxNode);
 
             break;
         }
@@ -192,7 +242,6 @@ bool lessThan(string value_1, string value_2, attrtype_t type)
 void readHead(ifstream & fin, index_head_t & head)
 {
     fin.read((char *)&head, sizeof(index_head_t));
-    fin.flush();
 }
 
 void writeHead(ofstream & fout, index_head_t & head)
@@ -208,7 +257,6 @@ void readNode(ifstream & fin, index_node_t & node)
     // fin.read((char *)&(node.basep), sizeof(void *));
     fin.read((char *)&(node.offset), sizeof(unsigned));
     node.value = buf;
-    fin.flush();
 }
 void writeNode(ofstream & fout, index_node_t & node)
 {

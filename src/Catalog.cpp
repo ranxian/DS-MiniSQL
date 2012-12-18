@@ -90,7 +90,6 @@ void readTable(ifstream & fin, table_t & table)
     {
         readAttr(fin, table.attributes[i]);
     }
-    fin.flush();
 }
 
 void writeAttr(ofstream & fout, attr_t & attr)
@@ -110,7 +109,6 @@ void readAttr(ifstream & fin, attr_t & attr)
     fin.read((char *)&(attr.length), sizeof(int));
     fin.read((char *)&(attr.type), sizeof(attrtype_t));
     attr.name = buf;
-    fin.flush();
 }
 
 Catalog::Catalog()
