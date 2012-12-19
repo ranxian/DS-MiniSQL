@@ -12,6 +12,7 @@ void Interpreter::inputCommand()
 
 void Interpreter::parseCommand()
 {
+
     clearInfo();
     int start, index;
     string seperators=" , \n";
@@ -33,22 +34,22 @@ void Interpreter::parseCommand()
             start = input.find_first_not_of(seperators,index+1);
         }
     }
-
-    if (command[0] == "create" || command[0] == "CRERATE")
+   // printf("%s\n",command[0].c_str() );
+    if (!strcasecmp(command[0].c_str(), "create"))
         parseCreate();
-    else if (command[0] == "select" || command[0] == "SELECT")
+    else if (!strcasecmp(command[0].c_str(), "select"))
         parseSelect();
-    else if (command[0] == "insert" || command[0] == "INSERT")
+    else if (!strcasecmp(command[0].c_str(), "insert"))
         parseInsert();
-    else if (command[0] == "delete" || command[0] == "DELETE")
+    else if (!strcasecmp(command[0].c_str(), "delete"))
         parseDelete();
-    else if (command[0] == "drop" || command[0] == "DROP")
+    else if (!strcasecmp(command[0].c_str(), "drop"))
         parseDrop();
-    else if (command[0] == "update" || command[0] == "UPDATE")
+    else if (!strcasecmp(command[0].c_str(), "update"))
         parseUpdate();
-    else if (command[0] == "quit" || command[0] == "QUIT")
+    else if (!strcasecmp(command[0].c_str(), "quit"))
         parseQuit();
-    else if (command[0] == "help" || command[0] == "HELP")
+    else if (!strcasecmp(command[0].c_str(), "help"))
         parseHelp();
 }
 
@@ -174,6 +175,7 @@ void Interpreter::clearInfo()
 
 void Interpreter::parseInsert()  //OK
 {
+    //printf("reach here\n");
     info.command = INSERT;
     info.tableName = command[2];
     int index1 ,index2;
@@ -183,7 +185,11 @@ void Interpreter::parseInsert()  //OK
     index2++;
     while (command[index1] != ")")
     {
+        //printf("%s %s\n",command[index1].c_str(),command[index2].c_str() );
         info.insertItems.insert(map<string,string>::value_type(command[index1],command[index2]));
+        index1++;
+        index2++;
+        //printf("%d %d\n",index1, index2 );
     }
 }
 
@@ -274,8 +280,11 @@ void Interpreter::debug()
     int i;
     printf("information type: %d\n" ,info.command);
     printf("tablename: %s\n",info.tableName.c_str() );
-    for (i = 0; i < info.t.attrNum; i++)
-        printf("%s %d\n",info.t.attributes[i].name.c_str(),info.t.attributes[i].length );
+    if (info.command == CREATE_TABLE)
+    {
+        for (i = 0; i < info.t.attrNum; i++)
+            printf("%s %d\n",info.t.attributes[i].name.c_str(),info.t.attributes[i].length );
+    }
     if (info.command == SELECT)
     {
         printf("selected items:\n");
@@ -284,5 +293,51 @@ void Interpreter::debug()
         printf("selected table:\n");
         for (i = 0; i < info.selectedTable.size();i++)
             printf("%s\n",info.selectedTable[i].c_str() );
+        printf("Condition tree:\n");
+        showConditionTree(info.tree);
+
+    }
+    if (info.command == INSERT)
+    {
+        std::map<string, string>::iterator iter = info.insertItems.begin();
+        while (iter != info.insertItems.end())
+        {
+            printf("%s %s\n",iter->first.c_str(),iter->second.c_str() );
+            iter++;
+        }
+    }
+    if (info.command == UPDATE)
+    {
+        std::map<string, string>::iterator iter = info.updateItems.begin();
+        while (iter != info.updateItems.end())
+        {
+            printf("%s %s\n",iter->first.c_str(),iter->second.c_str() );
+            iter++;
+        }
+        showConditionTree(info.tree);
+    }
+    if (info.command == DELETE)
+    {
+        showConditionTree(info.tree);
+    }
+    if (info.command == DROP_TABLE)
+    {
+
+    }
+}
+
+void Interpreter::showConditionTree(condition_tree_t * root)
+{
+    if (root == NULL)
+        return;
+    if (root->end)
+    {
+        printf("%s %d %s\n",root->leftOperand.c_str(),root->opName,root->rightOperand.c_str() );
+    }
+    else
+    {
+        printf("%d\n", root->logic );
+        showConditionTree(root->left);
+        showConditionTree(root->right);
     }
 }
