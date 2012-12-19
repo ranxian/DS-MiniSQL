@@ -2,8 +2,8 @@
  * MiniSQL.h - 宏定义，配置文件 
  ****************************/
 
-#ifndef MINISQL_H
-#define MINISQL_H
+#ifndef _MINISQL_H_
+#define _MINISQL_H_
 
 /* 引用库 */
 #include <iostream>
@@ -127,6 +127,7 @@ struct index_head_t
     index_node_t *firstNode; // 指向第一个索引
 };
 
+/* 记录类型 */
 struct record_t
 {   
     attrtype_t type;

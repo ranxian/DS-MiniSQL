@@ -7,10 +7,14 @@ using namespace std;
 class Interpreter
 {
 public:
-    void inputCommand();                                            // get command from STDIN
-    void getCondition(std::vector<string> command, condition_tree_t * condition);  // get condition tree
-    info_t getInfo();                                        // get the result after interpretion
-    void debug();                             // print information for debug
+    // get command from STDIN
+    void inputCommand();                                            
+    // get condition tree
+    void getCondition(std::vector<string> command, condition_tree_t * condition);  
+    // get the result after interpretion
+    info_t getInfo();                         
+    // print information for debug               
+    void debug();                             
 
 private:
     /*--------------parse different types of commands------------------*/
