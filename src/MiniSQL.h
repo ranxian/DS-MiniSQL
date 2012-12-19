@@ -21,12 +21,22 @@ using namespace std;
 #define MAX_ATTRNAME_LENGTH 256     /* 最长字段长度 */
 #define MAX_RECORD_LENGTH   256     /* 最长记录长度 */
 #define MAX_ATTR_NUM        32      /* 一个表的最长字段数目 */
-#define TABLE_LIST "table.list"     /* 保存表信息的文件 */
-#define INDEX_LIST "index.list"     /* 保存索引信息的文件 */
+#define TABLE_LIST "../data/table.list"     /* 保存表信息的文件 */
 #define FILE_PAGESIZE 4096          /* 虚拟页大小 */
 #define MEM_MAXPAGE 1000            /* 内存页最大数目 */
 #define FILENAME_MAXLEN 256         /* 文件名最大长度 */
 #define MAX_CHAR_LENGTH     32      /* 最大 CHAR 类型字段长度 */
+
+#define IDXHEAD_SIZE_IN_FILE (sizeof(attr_t) + sizeof(int))
+                                    /* 一个索引头在文件中所占的大小 */
+#define IDXNODE_SIZE_IN_FILE (sizeof(unsigned) + MAX_CHAR_LENGTH * sizeof(char)) 
+                                    /* 一个索引节点在文件中所占的大小 */
+#define ATTR_SIZE_IN_FILE (sizeof(bool) + sizeof(int) + sizeof(attrtype_t) + MAX_CHAR_LENGTH * sizeof(char))
+                                    /* 一个字段在文件中所占的大小 */
+#define TABLEHEAD_SIZE_IN_FILE (sizeof(int))
+                                    /* 一个表信息头在文件中所占的大小 */
+#define TABLENODE_SIZE_IN_FILE (2 * sizeof(int) + MAX_CHAR_LENGTH * sizeof(char) + MAX_ATTR_NUM * ATTR_SIZE_IN_FILE)
+                                    /* 一个表信息项在文件中所占的大小 */
 
 /* 语法元素定义 */
 
@@ -50,9 +60,15 @@ struct attr_t {
 struct table_t
 {
     string name;        // 表名
-    int attrNumber;     // 字段数
+    int attrNum;        // 字段数
     int recordLength;   // 一条记录的字节数
     attr_t attributes[MAX_ATTR_NUM];    //字段
+};
+
+/* 表信息文件的文件头 */
+struct table_head_t
+{   
+    int tableNum;       // 现存放的表的数量
 };
 
 /* 运算符类型 */
@@ -114,17 +130,19 @@ struct info_t {
 struct index_node_t 
 {
     string value;       // 关键码
-    void *basep;        // 内存中的基地址
+    // void *basep;        // 内存中的基地址
     unsigned offset;    // basep 的偏移
 
-    index_node_t *nextNode;
+    // index_node_t *nextNode;
 };
 
 /* 索引头 */
 struct index_head_t
 {
-    attr_t attr;            // 做索引的字段
-    index_node_t *firstNode; // 指向第一个索引
+    attr_t attr;                // 做索引的字段
+    int recNum;                 // 记录数目
+
+    // index_node_t *firstNode;    // 指向第一个索引
 };
 
 /* 记录类型 */

@@ -103,7 +103,7 @@ void Interpreter::parseCreate() // OK
         count++;
     }
 
-    info.t.attrNumber = count;
+    info.t.attrNum = count;
     info.t.recordLength = length;
 }
 
@@ -274,7 +274,7 @@ void Interpreter::debug()
     int i;
     printf("information type: %d\n" ,info.command);
     printf("tablename: %s\n",info.tableName.c_str() );
-    for (i = 0; i < info.t.attrNumber; i++)
+    for (i = 0; i < info.t.attrNum; i++)
         printf("%s %d\n",info.t.attributes[i].name.c_str(),info.t.attributes[i].length );
     if (info.command == SELECT)
     {
