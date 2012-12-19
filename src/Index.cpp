@@ -1,6 +1,6 @@
 #include "index.h"
 
-void Index::select(string tableName, string indexName, string value, index_node_t *res)
+void Index::selectIndex(string tableName, string indexName, string value, index_node_t *res)
 {
     ifstream fin;
 
@@ -32,7 +32,7 @@ void Index::select(string tableName, string indexName, string value, index_node_
     fin.close();
 }
 
-void Index::create(string tableName, string indexName, attr_t & attr)
+void Index::createIndex(string tableName, string indexName, attr_t & attr)
 {
     ofstream fout;
 
@@ -49,7 +49,7 @@ void Index::create(string tableName, string indexName, attr_t & attr)
     fout.close();
 }
 
-void Index::insert(string tableName, string indexName, index_node_t node)
+void Index::insertIndex(string tableName, string indexName, index_node_t node)
 {
     ifstream fin;
     ofstream fout;
@@ -57,6 +57,7 @@ void Index::insert(string tableName, string indexName, index_node_t node)
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
     fin.open(file.c_str(), ios::in | ios::binary);
+    fout.open(file.c_str(), ios::out | ios::binary);
 
     // 读出索引头
     index_head_t idxHd;
@@ -88,7 +89,6 @@ void Index::insert(string tableName, string indexName, index_node_t node)
         }
 
         // 查找合适的插入位置
-        bool atLast = true; // 判断是否要插到文件最后
         int pos = 0;        // 插入的位置
         for (int i = 0; i < recNum - 1; i++)
         {
@@ -96,38 +96,24 @@ void Index::insert(string tableName, string indexName, index_node_t node)
             if (lessThan(idxNode[i].value, node.value, type) &&
                 lessThan(idxNode[i + 1].value, node.value, type))
             {
-                atLast = false;
                 pos = i;
                 break;
             }
         }
 
-        // 应该插到最后
-        if (atLast)
-        {
-            // 改从文件尾写入的方式
-            fout.close();
-            fout.open(file.c_str(), ios::out | ios::app | ios::binary);
-
-            writeNode(fout, node);
-        }
-
         // 应该插到 pos 后
-        else
+        // 把写指针移动到写入新索引项的位置 即（索引头 + pos 个索引项之后）
+        // 指针的当前位置是索引头后面 故向后偏移 pos 个索引项的大小
+        int offset = pos * IDXNODE_SIZE_IN_FILE;
+        fout.seekp(offset, ios::cur);
+
+        // 写入插入项
+        writeNode(fout, node);
+
+        // 将插入项之后的索引项一条条写入
+        for (int i = pos + 1; i < recNum; i++)
         {
-            // 把写指针移动到写入新索引项的位置 即（索引头 + pos 个索引项之后）
-            // 指针的当前位置是索引头后面 故向后偏移 pos 个索引项的大小
-            int offset = pos * IDXNODE_SIZE_IN_FILE;
-            fout.seekp(offset, ios::cur);
-
-            // 写入插入项
-            writeNode(fout, node);
-
-            // 将插入项之后的索引项一条条写入
-            for (int i = pos + 1; i < recNum; i++)
-            {
-                writeNode(fout, idxNode[i]);
-            }
+            writeNode(fout, idxNode[i]);
         }
 
         // 回收内存
@@ -146,11 +132,16 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
     fin.open(file.c_str(), ios::in | ios::binary);
+    fout.open(file.c_str(), ios::out | ios::binary);
 
     // 读出索引头
     index_head_t idxHd;
     readHead(fin, idxHd);
     int recNum = idxHd.recNum;
+
+    // 更新索引头的索引项数目 并 写入
+    idxHd.recNum++;
+    writeHead(fout, idxHd);
 
     // 查找索引
     for (int i = 0; i < idxHd.recNum; i++)
@@ -184,7 +175,7 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     fout.close();
 }
 
-void Index::update(string tableName, string indexName, string value, string newValue)
+void Index::updateIndex(string tableName, string indexName, string value, string newValue)
 {
     ifstream fin;
     ofstream fout;
@@ -241,12 +232,14 @@ bool Index::lessThan(string value_1, string value_2, attrtype_t type)
 
 void Index::readHead(ifstream & fin, index_head_t & head)
 {
-    fin.read((char *)&head, sizeof(index_head_t));
+    fin.read((char *)&(head.attr), sizeof(attr_t));
+    fin.read((char *)&(head.recNum), sizeof(int));
 }
 
 void Index::writeHead(ofstream & fout, index_head_t & head)
 {
-    fout.write((char *)&head, sizeof(index_head_t));
+    fout.write((char *)&(head.attr), sizeof(attr_t));
+    fout.write((char *)&(head.recNum), sizeof(int));
     fout.flush();
 }
 
