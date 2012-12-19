@@ -29,6 +29,7 @@ private:
     void parseDrop();  
     /*-----------------------------------------------------*/         
     void clearInfo();           // clear all info before rewriting
+    void showConditionTree(condition_tree_t * root);
     string input;                                                   // command input by user
     std::vector<string> command;                                    // parsed command 
     info_t info;                // infomation interpreted by Interpreter
