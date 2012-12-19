@@ -19,7 +19,7 @@ public:
     // 建立索引
     void createIndex(string tableName, string indexName, attr_t & attr);                           
     // 插入关键码为 value 的新索引项
-    void insertIndex(string tableName, string indexName, index_node_t node);
+    void insertIndex(string tableName, string indexName, index_node_t & node);
     // 删除关键码为 value 的索引项
     void deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
@@ -28,10 +28,10 @@ public:
     ~Index();
 private:
     inline bool lessThan(string value_1, string value_2, attrtype_t type);
-    inline void readHead(ifstream & fin, index_head_t & head);
-    inline void writeHead(ofstream & fout, index_head_t & head);
-    inline void readNode(ifstream & fin, index_node_t & node);
-    inline void writeNode(ofstream & fout, index_node_t & node);
+    inline void readHead(fstream & fin, index_head_t & head);
+    inline void writeHead(fstream & fout, index_head_t & head);
+    inline void readNode(fstream & fin, index_node_t & node);
+    inline void writeNode(fstream & fout, index_node_t & node);
 };
 
 #endif
