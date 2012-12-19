@@ -130,7 +130,7 @@ struct info_t {
 struct index_node_t 
 {
     string value;       // 关键码
-    // void *basep;        // 内存中的基地址
+    // void *basep;     // 内存中的基地址
     unsigned offset;    // basep 的偏移
 
     // index_node_t *nextNode;
@@ -145,12 +145,16 @@ struct index_head_t
     // index_node_t *firstNode;    // 指向第一个索引
 };
 
-/* 记录类型 */
-struct record_t
-{   
+struct value_t
+{
     attrtype_t type;
     string str_value;
     int int_value;
+};
+/* 记录类型 */
+struct record_t
+{   
+    value_t *value;
     record_t *next;
 };
 
