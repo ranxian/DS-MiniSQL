@@ -20,18 +20,19 @@ public:
     // 建表  
     void createTable(table_t & table);                  
     // 删除表 
-    void deleteTable(table_t & table);                   
+    void deleteTable(table_t & table);
+    // 初始化表文件（写入表信息头）
+    void initTable();                   
 
     Catalog();
     ~Catalog();
-private:
-
-    inline void writeTableHead(ofstream & fout, table_head_t & tableHead);
-    inline void readTableHead(ifstream & fin, table_head_t & tableHead);
-    inline void writeTable(ofstream & fout, table_t & table);
-    inline void readTable(ifstream & fin, table_t & table);
-    inline void writeAttr(ofstream & fout, attr_t & attr);
-    inline void readAttr(ifstream & fin, attr_t & attr);
+// private:
+     void writeTableHead(fstream & fout, table_head_t & tableHead);
+     void readTableHead(fstream & fin, table_head_t & tableHead);
+     void writeTable(fstream & fout, table_t & table);
+     void readTable(fstream & fin, table_t & table);
+     void writeAttr(fstream & fout, attr_t & attr);
+     void readAttr(fstream & fin, attr_t & attr);
 };
 
 #endif

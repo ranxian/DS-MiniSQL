@@ -2,16 +2,16 @@
 
 attr_t Catalog::findAttr(string tableName, string attrName)
 {
-    ifstream fin;
-    fin.open(TABLE_LIST, ios::in);
+    fstream fin;
+    fin.open(TABLE_LIST, ios::in | ios::binary);
 
     table_t tableTmp;
     attr_t attrTmp;
 
     // 读出表信息头 获得表项的数目
-    table_head_t tableHd;
+    static table_head_t tableHd;
     readTableHead(fin, tableHd);
-    int tableNum = tableHd.tableNum;
+    static int tableNum = tableHd.tableNum;
 
     // 查找表名为 tableName 的表项
     for (int i = 0; i < tableNum; i++)
@@ -38,13 +38,13 @@ attr_t Catalog::findAttr(string tableName, string attrName)
 
 table_t Catalog::findTable(string tableName)
 {
-    ifstream fin;
-    fin.open(TABLE_LIST, ios::in);
+    fstream fin;
+    fin.open(TABLE_LIST, ios::in | ios::binary);
 
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    table_head_t tableHd;
+    static table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -64,14 +64,14 @@ table_t Catalog::findTable(string tableName)
 
 attr_t Catalog::getPrimaryAttrName(string tableName)
 {
-    ifstream fin;
-    fin.open(TABLE_LIST, ios::in);
+    fstream fin;
+    fin.open(TABLE_LIST, ios::in | ios::binary);
 
     table_t tableTmp;
     attr_t attrTmp;
 
     // 读出表信息头 获得表项的数目
-    table_head_t tableHd;
+    static table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -100,21 +100,23 @@ attr_t Catalog::getPrimaryAttrName(string tableName)
 
 bool Catalog::tableExist(string tableName)
 {
-    ifstream fin;
-    fin.open(TABLE_LIST, ios::in);
+    fstream fin;
+    fin.open(TABLE_LIST, ios::in | ios::binary);
 
     bool exist = false;
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    table_head_t tableHd;
+    static table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
+    cout << "tableNum: " << tableNum << endl;
 
     // 查找是否存在表名为 tableName 的表项
     for (int i = 0; i < tableNum; i++)
     {
         readTable(fin, tableTmp);
+        cout << "tableName: " << tableTmp.name << endl;
         if (tableTmp.name == tableName)
         {
             exist = true;
@@ -128,14 +130,14 @@ bool Catalog::tableExist(string tableName)
 
 bool Catalog::attrExist(string tableName, string attrName)
 {
-    ifstream fin;
-    fin.open(TABLE_LIST, ios::in);
+    fstream fin;
+    fin.open(TABLE_LIST, ios::in | ios::binary);
 
     bool exist = false;
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    table_head_t tableHd;
+    static table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -165,83 +167,106 @@ bool Catalog::attrExist(string tableName, string attrName)
 
 void Catalog::createTable(table_t & table)
 {
-    ifstream fin;
-    ofstream fout;
-    fin.open(TABLE_LIST, ios::in | ios::binary);
-    fout.open(TABLE_LIST, ios::out | ios::binary);
+    // ifstream fin;
+    // ofstream fout;
+    fstream fs;
+    // fin.open(TABLE_LIST, ios::in | ios::binary);
+    // fout.open(TABLE_LIST, ios::out | ios::binary);
+    fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
 
     // 读出表头 更新表头的表数目 并 写入
-    table_head_t tableHd;
-    readTableHead(fin, tableHd);
+    static table_head_t tableHd;
+    fs.seekg(0, ios::beg);
+    readTableHead(fs, tableHd);
     tableHd.tableNum++;
-    writeTableHead(fout, tableHd);
+    fs.seekp(0, ios::beg);
+    writeTableHead(fs, tableHd);
 
     // 将写指针移动到文件末尾
     // 写入新建立的表的信息
-    fout.seekp(ios::end);
-    writeTable(fout, table);
+    fs.seekp(0, ios::end);
+    writeTable(fs, table);
 
-    fin.close();
+    // fin.close();
+    // fout.close();
+    fs.close();
+}
+
+void Catalog::initTable()
+{
+    fstream fout;
+    fout.open(TABLE_LIST, ios::out | ios::binary);
+
+    static table_head_t tableHd;
+    tableHd.tableNum = 0;
+    writeTableHead(fout, tableHd);
+
     fout.close();
 }
 
 void Catalog::deleteTable(table_t & table)
 {
-    ifstream fin;
-    ofstream fout;
-    fin.open(TABLE_LIST, ios::in | ios::binary);
-    fout.open(TABLE_LIST, ios::out | ios::binary);
+    // 更改读写指针太鸡巴了！
+    fstream fs;
+    fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
 
     // 读出表头 获得表的数量
-    table_head_t tableHd;
-    readTableHead(fin, tableHd);
+    static table_head_t tableHd;
+    // 更改读指针
+    fs.seekg(0, ios::beg);
+    readTableHead(fs, tableHd);
+    // 记录写指针
+    int readPos = fs.tellg();
     int tableNum = tableHd.tableNum;
 
     // 更新表头中表的数量 并 将表头写入
     tableHd.tableNum--;
-    writeTableHead(fout, tableHd);
+    // 更改写指针
+    fs.seekp(0, ios::beg);
+    writeTableHead(fs, tableHd);
 
     // 读出所有表项 并 找到要删除的表的位置
     int n = 0;      // 第 n 个表项是要删除的表项
     int pos = 0;    // pos 是要删除的表项的起始地址
+    // 更改读指针
+    fs.seekg(readPos);
     // 开辟空间存放所有表项
     table_t *tables = new table_t[tableNum];
     for (int i = 0; i < tableNum; i++)
     {
-        readTable(fin, tables[i]);
+        readTable(fs, tables[i]);
         if (tables[i].name == table.name)
         {
             n = i;
-            pos = (int)fin.tellg() - (int)TABLENODE_SIZE_IN_FILE;
+            pos = (int)fs.tellg() - (int)TABLENODE_SIZE_IN_FILE;
         }
     }
 
     // 从地址 pos 处开始写入第 n + 1 及其后面的表信息项
-    fout.seekp(pos);
+    fs.seekp(pos);
     for (int i = n + 1; i < tableNum; i++)
     {
-        writeTable(fout, tables[i]);
+        writeTable(fs, tables[i]);
     }
 
     // 回收内存
     delete [] tables;
 
-    fin.close();
-    fout.close();
+    fs.close();
 }
 
-void Catalog::writeTableHead(ofstream & fout, table_head_t & tableHead)
+void Catalog::writeTableHead(fstream & fout, table_head_t & tableHead)
 {
     fout.write((char *)&(tableHead.tableNum), sizeof(int));
     fout.flush();
 }
 
-void Catalog::readTableHead(ifstream & fin, table_head_t & tableHead)
+void Catalog::readTableHead(fstream & fin, table_head_t & tableHead)
 {
     fin.read((char *)&(tableHead.tableNum), sizeof(int));
 }
 
-void Catalog::writeTable(ofstream & fout, table_t & table)
+void Catalog::writeTable(fstream & fout, table_t & table)
 {
     fout.write((char *)table.name.c_str(), MAX_CHAR_LENGTH);
     fout.write((char *)&(table.attrNum), sizeof(int));
@@ -253,7 +278,7 @@ void Catalog::writeTable(ofstream & fout, table_t & table)
     fout.flush();
 }
 
-void Catalog::readTable(ifstream & fin, table_t & table)
+void Catalog::readTable(fstream & fin, table_t & table)
 {
     char buf[MAX_CHAR_LENGTH];
     fin.read((char *)buf, MAX_CHAR_LENGTH);
@@ -266,7 +291,7 @@ void Catalog::readTable(ifstream & fin, table_t & table)
     }
 }
 
-void Catalog::writeAttr(ofstream & fout, attr_t & attr)
+void Catalog::writeAttr(fstream & fout, attr_t & attr)
 {
     fout.write((char *)attr.name.c_str(), MAX_CHAR_LENGTH);
     fout.write((char *)&(attr.isPrimary), sizeof(bool));
@@ -275,7 +300,7 @@ void Catalog::writeAttr(ofstream & fout, attr_t & attr)
     fout.flush();
 }
 
-void Catalog::readAttr(ifstream & fin, attr_t & attr)
+void Catalog::readAttr(fstream & fin, attr_t & attr)
 {
     char buf[MAX_CHAR_LENGTH];
     fin.read((char *)buf, MAX_CHAR_LENGTH);
