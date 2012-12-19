@@ -1,4 +1,4 @@
-#include "index.h"
+#include "Index.h"
 
 void Index::selectIndex(string tableName, string indexName, string value, index_node_t *res)
 {
