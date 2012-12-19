@@ -169,6 +169,9 @@ void Index::deleteIndex(string tableName, string indexName, string value)
         {
             writeNode(fout, idxNode[i]);
         }
+
+        // 回收内存
+        delete [] idxNode;
     }
 
     fin.close();

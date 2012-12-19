@@ -2,19 +2,101 @@
 
 attr_t Catalog::findAttr(string tableName, string attrName)
 {
+    ifstream fin;
+    fin.open(TABLE_LIST, ios::in);
 
+    table_t tableTmp;
+    attr_t attrTmp;
+
+    // 读出表信息头 获得表项的数目
+    table_head_t tableHd;
+    readTableHead(fin, tableHd);
+    int tableNum = tableHd.tableNum;
+
+    // 查找表名为 tableName 的表项
+    for (int i = 0; i < tableNum; i++)
+    {
+        readTable(fin, tableTmp);
+        // 查找表中名为 attrName 的字段
+        if (tableTmp.name == tableName)
+        {
+            for (int j = 0; j < tableTmp.attrNum; j++)
+            {
+                if (tableTmp.attributes[j].name == attrName)
+                {
+                    attrTmp = tableTmp.attributes[j];
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    fin.close();
+    return attrTmp;
 }
 
 table_t Catalog::findTable(string tableName)
 {
+    ifstream fin;
+    fin.open(TABLE_LIST, ios::in);
 
+    table_t tableTmp;
+
+    // 读出表信息头 获得表项的数目
+    table_head_t tableHd;
+    readTableHead(fin, tableHd);
+    int tableNum = tableHd.tableNum;
+
+    // 查找表名为 tableName 的表项
+    for (int i = 0; i < tableNum; i++)
+    {
+        readTable(fin, tableTmp);
+        if (tableTmp.name == tableName)
+        {
+            break;
+        }
+    }
+
+    fin.close();
+    return tableTmp;
 }
 
-attr_t Catalog::getPrimaryAttrName()
+attr_t Catalog::getPrimaryAttrName(string tableName)
 {
+    ifstream fin;
+    fin.open(TABLE_LIST, ios::in);
 
+    table_t tableTmp;
+    attr_t attrTmp;
+
+    // 读出表信息头 获得表项的数目
+    table_head_t tableHd;
+    readTableHead(fin, tableHd);
+    int tableNum = tableHd.tableNum;
+
+    // 查找表名为 tableName 的表项
+    for (int i = 0; i < tableNum; i++)
+    {
+        readTable(fin, tableTmp);
+        // 查找表中是主键的字段
+        if (tableTmp.name == tableName)
+        {
+            for (int j = 0; j < tableTmp.attrNum; j++)
+            {
+                if (tableTmp.attributes[j].isPrimary)
+                {
+                    attrTmp = tableTmp.attributes[j];
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    fin.close();
+    return attrTmp;
 }
-
 
 bool Catalog::tableExist(string tableName)
 {
@@ -44,14 +126,41 @@ bool Catalog::tableExist(string tableName)
     return exist;
 }
 
-bool Catalog::attrTypeCheck()
-{
-
-}
-
 bool Catalog::attrExist(string tableName, string attrName)
 {
+    ifstream fin;
+    fin.open(TABLE_LIST, ios::in);
 
+    bool exist = false;
+    table_t tableTmp;
+
+    // 读出表信息头 获得表项的数目
+    table_head_t tableHd;
+    readTableHead(fin, tableHd);
+    int tableNum = tableHd.tableNum;
+
+    // 查找是否存在表名为 tableName 的表项
+    for (int i = 0; i < tableNum; i++)
+    {
+        readTable(fin, tableTmp);
+        // 该表存在 查找表中是否存在名为 attrName 的字段
+        if (tableTmp.name == tableName)
+        {
+            for (int j = 0; j < tableTmp.attrNum; j++)
+            {
+                // 该字段存在
+                if (tableTmp.attributes[j].name == attrName)
+                {
+                    exist = true;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    fin.close();
+    return exist;
 }
 
 void Catalog::createTable(table_t & table)
@@ -114,7 +223,7 @@ void Catalog::deleteTable(table_t & table)
         writeTable(fout, tables[i]);
     }
 
-    // 回收内存空间
+    // 回收内存
     delete [] tables;
 
     fin.close();
