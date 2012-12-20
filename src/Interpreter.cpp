@@ -95,7 +95,7 @@ bool Interpreter::parseCommand()
         return parseHelp();
     else
     {
-        printf("Command invalid. Please check again.\n");
+        printf("Command '%s' invalid. Please check again.\n",command[0].c_str());
         return false;
     }
 }
@@ -115,6 +115,11 @@ bool Interpreter::parseCreate() // OK
     info.t.name = command[2];
     while (command[i] != ")")
     {
+        if (i == command.size())
+        {
+            printf("Syntax error in Create cmmand. (Forget the ')' ?)\n");
+            return false;
+        }
         info.t.attributes[count].name = command[i];
         i++;
         if (!strcasecmp(command[i].c_str(),"int"))
@@ -179,7 +184,7 @@ bool Interpreter::parseDrop()   //OK
     info.command = DROP_TABLE;
     if (command.size() != 3)
     {
-        printf("sysntax error in drop command. Please check again\n");
+        printf("Syntax error in drop command. Please check again\n");
         return false;
     }
     info.tableName = command[2];
@@ -196,10 +201,17 @@ bool Interpreter::parseSelect() //OK
         i++; 
         if (i == command.size())
         {
-            printf("systax error: no talbe specified\n");
+            printf("Systax error: No talbe specified\n");
+            return false;
         }   
     }
     i++;
+    if (i == command.size())
+    {
+        printf("Systax error: No talbe specified\n");
+        return false;
+
+    }
     while (strcasecmp(command[i].c_str(),"where"))
     {
         info.selectedTable.push_back(command[i]);
@@ -245,6 +257,11 @@ bool Interpreter::parseInsert()  //OK
 {
     //printf("reach here\n");
     info.command = INSERT;
+    if (command.size() < 3)
+    {
+        printf("Systax error. Need more input\n");
+        return false;
+    }
     info.tableName = command[2];
     int index1 ,index2;
     index1 = index2 = 4;
@@ -431,6 +448,9 @@ void Interpreter::clearTree(condition_tree_t * root)
     {
         clearTree(root->left);
         clearTree(root->right);
+
     }
+    root->left = NULL;
+    root->right = NULL;
     delete root;
 }
