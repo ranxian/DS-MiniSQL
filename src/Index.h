@@ -28,6 +28,8 @@ public:
     ~Index();
 private:
     inline bool lessThan(string value_1, string value_2, attrtype_t type);
+    inline void readAttr(fstream & fin, attr_t & attr);
+    inline void writeAttr(fstream & fout, attr_t & attr);
     inline void readHead(fstream & fin, index_head_t & head);
     inline void writeHead(fstream & fout, index_head_t & head);
     inline void readNode(fstream & fin, index_node_t & node);

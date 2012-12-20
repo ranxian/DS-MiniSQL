@@ -167,11 +167,8 @@ bool Catalog::attrExist(string tableName, string attrName)
 
 void Catalog::createTable(table_t & table)
 {
-    // ifstream fin;
-    // ofstream fout;
+    // 更改读写指针太鸡巴了！
     fstream fs;
-    // fin.open(TABLE_LIST, ios::in | ios::binary);
-    // fout.open(TABLE_LIST, ios::out | ios::binary);
     fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
 
     // 读出表头 更新表头的表数目 并 写入
@@ -187,8 +184,6 @@ void Catalog::createTable(table_t & table)
     fs.seekp(0, ios::end);
     writeTable(fs, table);
 
-    // fin.close();
-    // fout.close();
     fs.close();
 }
 

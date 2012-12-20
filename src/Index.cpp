@@ -51,6 +51,7 @@ void Index::createIndex(string tableName, string indexName, attr_t & attr)
 
 void Index::insertIndex(string tableName, string indexName, index_node_t & node)
 {
+    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -129,6 +130,7 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
 
 void Index::deleteIndex(string tableName, string indexName, string value)
 {
+    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -142,48 +144,48 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     int readPos = fs.tellg();
     int recNum = idxHd.recNum;
 
-    // 更新索引头的索引项数目 并 写入
-    idxHd.recNum++;
+    // 更新索引头的索引项数目
+    idxHd.recNum--;
+    // 更新写指针位置 并 写入
+    fs.seekp(0, ios::beg);
     writeHead(fs, idxHd);
 
     // 查找索引
-    for (int i = 0; i < idxHd.recNum; i++)
+    // 存放读出来的索引项
+    index_node_t *idxNode = new index_node_t[recNum];
+    // 读出索引项 并 找到要删除的索引项
+    int deleteCnt;              // 第 deleteCnt 个索引项是要删除的索引项
+    int writePos = readPos;     // 记录写指针位置
+    // 更新读指针位置
+    fs.seekg(readPos);
+    for (int i = 0; i < recNum; i++)
     {
-        static index_node_t curIdxNode;
-        readNode(fs, curIdxNode);
-
-        // 存放读出来的索引项
-        index_node_t *idxNode = new index_node_t[recNum];
-        // 读出索引项 并 找到要删除的索引项
-        int deletePos;    // 第 deletePos 个索引项是要删除的索引项
-        // 更新读指针位置
-        fs.seekg(readPos);
-        for (int i = 0; i < recNum; i++)
+        readNode(fs, idxNode[i]);
+        if (idxNode[i].value == value)
         {
-            readNode(fs, idxNode[i]);
-            if (idxNode[i].value == value)
-            {
-                deletePos = i;
-            }
+            deleteCnt = i;
+            break;
         }
-
-        // 将写指针放到第 deletePos 个索引项的开头
-        // 写第 deletePos + 1 及其后面的所有索引项
-        fs.seekp(IDXHEAD_SIZE_IN_FILE + (deletePos - 1) * IDXNODE_SIZE_IN_FILE);
-        for (int i = deletePos + 1; i < recNum; i++)
-        {
-            writeNode(fs, idxNode[i]);
-        }
-
-        // 回收内存
-        delete [] idxNode;
+        writePos = fs.tellp();
     }
+
+    // 将写指针放到第 deletePos 个索引项的开头
+    // 写第 deletePos + 1 及其后面的所有索引项
+    fs.seekp(writePos);
+    for (int i = deleteCnt + 1; i < recNum; i++)
+    {
+        writeNode(fs, idxNode[i]);
+    }
+
+    // 回收内存
+    delete [] idxNode;
 
     fs.close();
 }
 
 void Index::updateIndex(string tableName, string indexName, string value, string newValue)
 {
+    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -195,6 +197,7 @@ void Index::updateIndex(string tableName, string indexName, string value, string
     readHead(fs, idxHd);
 
     // 查找索引
+    int writePos = fs.tellg();      // 记录写指针位置
     for (int i = 0; i < idxHd.recNum; i++)
     {
         static index_node_t curIdxNode;
@@ -208,11 +211,12 @@ void Index::updateIndex(string tableName, string indexName, string value, string
 
             // 将更新了的索引项写回文件
             // 先将写指针放到正确位置
-            fs.seekp((int)fs.tellg() - (int)IDXNODE_SIZE_IN_FILE);
+            fs.seekp(writePos);
             writeNode(fs, curIdxNode);
 
             break;
         }
+        writePos = fs.tellg();
     }
 
     fs.close();
@@ -235,15 +239,34 @@ bool Index::lessThan(string value_1, string value_2, attrtype_t type)
     }
 }
 
+void Index::readAttr(fstream & fin, attr_t & attr)
+{
+    char buf[MAX_CHAR_LENGTH];
+    fin.read((char *)buf, MAX_CHAR_LENGTH);
+    fin.read((char *)&(attr.isPrimary), sizeof(bool));
+    fin.read((char *)&(attr.length), sizeof(int));
+    fin.read((char *)&(attr.type), sizeof(attrtype_t));
+    attr.name = buf;
+}
+
+void Index::writeAttr(fstream & fout, attr_t & attr)
+{
+    fout.write((char *)attr.name.c_str(), MAX_CHAR_LENGTH);
+    fout.write((char *)&(attr.isPrimary), sizeof(bool));
+    fout.write((char *)&(attr.length), sizeof(int));
+    fout.write((char *)&(attr.type), sizeof(attrtype_t));
+    fout.flush();
+}
+
 void Index::readHead(fstream & fin, index_head_t & head)
 {
-    fin.read((char *)&(head.attr), sizeof(attr_t));
+    readAttr(fin, head.attr);
     fin.read((char *)&(head.recNum), sizeof(int));
 }
 
 void Index::writeHead(fstream & fout, index_head_t & head)
 {
-    fout.write((char *)&(head.attr), sizeof(attr_t));
+    writeAttr(fout, head.attr);
     fout.write((char *)&(head.recNum), sizeof(int));
     fout.flush();
 }
