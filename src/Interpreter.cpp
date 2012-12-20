@@ -3,19 +3,22 @@
 
 
 
-void Interpreter::inputCommand()
+bool Interpreter::inputCommand()
 {
     getline(cin, input, ';');
     cin.get();
-    parseCommand();
+    return parseCommand();
 }
 
-void Interpreter::parseCommand()
+bool Interpreter::parseCommand()
 {
-
+    int i, count = 0;
     clearInfo();
     int start, index;
+    int cutIndex;
     string seperators=" , \n";
+    string cut = "()<>";
+    string temp;
 
     start = input.find_first_not_of(seperators);
 
@@ -25,32 +28,76 @@ void Interpreter::parseCommand()
         index = input.find_first_of(seperators,start);
         if (index == string::npos)
         {
-            command.push_back(input.substr(start));
+            temp = (input.substr(start,index-start));
+            while ((cutIndex = temp.find_first_of(cut)) != string::npos)
+            {
+                if (temp.length() == 1)
+                    break;
+                command.push_back(temp.substr(0,cutIndex));
+                command.push_back(temp.substr(cutIndex,1));
+                temp = temp.substr(cutIndex+1);
+            }
+            if (temp != "")
+                command.push_back(temp);
             break;
         }
         else
         {
-            command.push_back(input.substr(start,index-start));
+            temp = (input.substr(start,index-start));
+            while ((cutIndex = temp.find_first_of(cut)) != string::npos)
+            {
+                if (temp.length() == 1)
+                    break;
+                command.push_back(temp.substr(0,cutIndex));
+                command.push_back(temp.substr(cutIndex,1));
+                temp = temp.substr(cutIndex+1);
+            }
+            if (temp != "")
+                command.push_back(temp);
             start = input.find_first_not_of(seperators,index+1);
         }
     }
+
+    for (i = 0; i < command.size(); i++)
+    {
+        if (command[i] == "(")
+            count++;
+        if (command[i] == ")")
+            count--;
+        if (count < 0)
+        {
+            printf("Brackets doesn't match. Please check again.\n");
+            return false;
+        }
+    }
+    if (count != 0)
+    {
+        printf("Brackets doesn't match. Please check again.\n");
+        return false;
+    }
+
    // printf("%s\n",command[0].c_str() );
     if (!strcasecmp(command[0].c_str(), "create"))
-        parseCreate();
+        return parseCreate();
     else if (!strcasecmp(command[0].c_str(), "select"))
-        parseSelect();
+        return parseSelect();
     else if (!strcasecmp(command[0].c_str(), "insert"))
-        parseInsert();
+        return parseInsert();
     else if (!strcasecmp(command[0].c_str(), "delete"))
-        parseDelete();
+        return parseDelete();
     else if (!strcasecmp(command[0].c_str(), "drop"))
-        parseDrop();
+        return parseDrop();
     else if (!strcasecmp(command[0].c_str(), "update"))
-        parseUpdate();
+        return parseUpdate();
     else if (!strcasecmp(command[0].c_str(), "quit"))
-        parseQuit();
+        return parseQuit();
     else if (!strcasecmp(command[0].c_str(), "help"))
-        parseHelp();
+        return parseHelp();
+    else
+    {
+        printf("Command invalid. Please check again.\n");
+        return false;
+    }
 }
 
 info_t Interpreter::getInfo()
@@ -58,7 +105,7 @@ info_t Interpreter::getInfo()
     return info;
 }
 
-void Interpreter::parseCreate() // OK
+bool Interpreter::parseCreate() // OK
 {
     int count = 0;
     int i = 4;
@@ -70,28 +117,34 @@ void Interpreter::parseCreate() // OK
     {
         info.t.attributes[count].name = command[i];
         i++;
-        if (command[i] == "int" || command[i] == "INT")
+        if (!strcasecmp(command[i].c_str(),"int"))
         {
             info.t.attributes[count].type = INT;
             info.t.attributes[count].length = 4;
             info.t.attributes[count].isPrimary = false;
             length += 4;
         }
-        else if (command[i] == "char" || command[i] == "CHAR" )
+        else if (!strcasecmp(command[i].c_str(),"char"))
         {
             info.t.attributes[count].type = CHAR;
             info.t.attributes[count].length = 32;
             info.t.attributes[count].isPrimary = false;
             length += 32;
         }
+        else
+        {
+            printf("The type '%s' is not supported. Please check again.\n",command[i].c_str() );
+            info.command = NONE;
+            return false;
+        }
         i++;
-        if (command[i] == "primary")
+        if (!strcasecmp(command[i].c_str(),"Primary"))
         {
             info.t.attributes[count].isPrimary = true;
             i++;
             i++;
         }
-        if (command[i] == "default")
+        if (!strcasecmp(command[i].c_str(),"default"))
         {
             i++;
 
@@ -100,52 +153,66 @@ void Interpreter::parseCreate() // OK
 
             i++;
         }
-
+    
         count++;
     }
 
     info.t.attrNum = count;
     info.t.recordLength = length;
+    return true;
 }
 
-void Interpreter::parseHelp()   // OK
+bool Interpreter::parseHelp()   // OK
 {
     info.command = HELP;
+    return true;
 }
 
-void Interpreter::parseQuit()   //OK
+bool Interpreter::parseQuit()   //OK
 {
     info.command = QUIT;
+    return true;
 }
 
-void Interpreter::parseDrop()   //OK
+bool Interpreter::parseDrop()   //OK
 {
     info.command = DROP_TABLE;
+    if (command.size() != 3)
+    {
+        printf("sysntax error in drop command. Please check again\n");
+        return false;
+    }
     info.tableName = command[2];
+    return true;
 }
 
-void Interpreter::parseSelect() //OK
+bool Interpreter::parseSelect() //OK
 {
     info.command = SELECT;
     int i = 1;
-    while (command[i] != "from" && command[i] != "FROM")
+    while (strcasecmp(command[i].c_str(),"from"))
     {
         info.selectedItems.push_back(command[i]);
-        i++;    
+        i++; 
+        if (i == command.size())
+        {
+            printf("systax error: no talbe specified\n");
+        }   
     }
     i++;
-    while (command[i] != "where" && command[i] != "WHERE" && i < command.size())
+    while (strcasecmp(command[i].c_str(),"where"))
     {
         info.selectedTable.push_back(command[i]);
         i++;
     }
-    if (command[i] == "where" || command[i] == "WHERE")
+    if (!strcasecmp(command[i].c_str(),"where"))
     {
         info.tree = makeTree(i+1);
     }
+    return true;
 }
 
-void Interpreter::parseDelete() //OK
+bool Interpreter::parseDelete() //OK
 {
     info.command = DELETE;
     info.command = DELETE;
@@ -158,6 +225,7 @@ void Interpreter::parseDelete() //OK
     {
         info.tree = makeTree(4);
     }
+    return true;
 }
 
 void Interpreter::clearInfo()
@@ -166,14 +234,14 @@ void Interpreter::clearInfo()
     info.command = NONE;
     info.tableName = "";
     if (info.tree)
-        delete info.tree;
+        clearTree(info.tree);
     info.tree = NULL;
     info.selectedItems.clear();
     info.selectedTable.clear();
     info.insertItems.clear();
 }
 
-void Interpreter::parseInsert()  //OK
+bool Interpreter::parseInsert()  //OK
 {
     //printf("reach here\n");
     info.command = INSERT;
@@ -191,9 +259,10 @@ void Interpreter::parseInsert()  //OK
         index2++;
         //printf("%d %d\n",index1, index2 );
     }
+    return true;
 }
 
-void Interpreter::parseUpdate() //OK
+bool Interpreter::parseUpdate() //OK
 {
     info.command = UPDATE;
     info.tableName = command[1];
@@ -202,12 +271,12 @@ void Interpreter::parseUpdate() //OK
     info.updateItems.insert(map<string,string>::value_type(command[index1],command[index2]));
     if (command.size() != 6)
     {
-        if (command[6] == "where" || command[6] == "WHERE")
+        if (!strcasecmp(command[6].c_str(),"where"))
         {
             info.tree = makeTree(7);
         }
     }
-
+    return true;
 }
 
 condition_tree_t * Interpreter::makeTree(int index)
@@ -220,14 +289,14 @@ condition_tree_t * Interpreter::makeTree(int index)
     while (i < command.size())
     {
         ptr = new condition_tree_t();
-        if (command[i] == "AND" || command[i] == "and")
+        if (!strcasecmp(command[i].c_str(),"and"))
         {
             ptr->logic = AND;
             ptr->end = false;
             logic.push(ptr);
             i++;
         }
-        else if (command[i] == "OR" || command[i] == "or")
+        else if (!strcasecmp(command[i].c_str(),"or"))
         {
             ptr->logic = OR;
             ptr->end = false;
@@ -253,6 +322,20 @@ condition_tree_t * Interpreter::makeTree(int index)
             i++;
             ptr->rightOperand = command[i];
             ptr->end = true;
+            if (isdigit(ptr->leftOperand[0]))
+            {
+                string t = ptr->leftOperand;
+                ptr->leftOperand = ptr->rightOperand;
+                ptr->rightOperand = t;
+                if (ptr->opName == GT)
+                    ptr->opName = LT;
+                else if (ptr->opName == LT)
+                    ptr->opName = GT;
+                else if (ptr->opName == GTE)
+                    ptr->opName = LTE;
+                else if (ptr->opName == LTE)
+                    ptr->opName = GTE;
+            }
             atom.push(ptr);
             i++;
         }
@@ -340,4 +423,14 @@ void Interpreter::showConditionTree(condition_tree_t * root)
         showConditionTree(root->left);
         showConditionTree(root->right);
     }
+}
+
+void Interpreter::clearTree(condition_tree_t * root)
+{
+    if (!root->end)
+    {
+        clearTree(root->left);
+        clearTree(root->right);
+    }
+    delete root;
 }
