@@ -5,8 +5,8 @@
 
 /*
 *   NOTE: 由于 B+ 树的代码量碉堡了，改用 线性索引 方式实现，若还有余力再改为 B+ 树
-*         现在采用从小到大的顺序排列
-*         待修改为 二分查找 / 二级索引 / B+ 树
+*         现在采用 线性索引 + 二分搜索
+*         待修改为 二级索引 / B+ 树
 */
 
 /***********************************************************/
@@ -27,7 +27,11 @@ public:
     Index();
     ~Index();
 private:
+    // 二分查找，返回关键码为 value 的节点的起始地址，给 select, update 使用
+    inline int biSearch(fstream & fin, int from, int to, string value, attrtype_t type);
+    // 比较关键码大小
     inline bool lessThan(string value_1, string value_2, attrtype_t type);
+    // 文件读写的包装函数
     inline void readAttr(fstream & fin, attr_t & attr);
     inline void writeAttr(fstream & fout, attr_t & attr);
     inline void readHead(fstream & fin, index_head_t & head);

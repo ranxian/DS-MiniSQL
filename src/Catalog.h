@@ -26,7 +26,8 @@ public:
 
     Catalog();
     ~Catalog();
-// private:
+private:
+    // 文件读写的包装函数
      void writeTableHead(fstream & fout, table_head_t & tableHead);
      void readTableHead(fstream & fin, table_head_t & tableHead);
      void writeTable(fstream & fout, table_t & table);

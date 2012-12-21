@@ -9,9 +9,9 @@ attr_t Catalog::findAttr(string tableName, string attrName)
     attr_t attrTmp;
 
     // 读出表信息头 获得表项的数目
-    static table_head_t tableHd;
+    table_head_t tableHd;
     readTableHead(fin, tableHd);
-    static int tableNum = tableHd.tableNum;
+    int tableNum = tableHd.tableNum;
 
     // 查找表名为 tableName 的表项
     for (int i = 0; i < tableNum; i++)
@@ -44,7 +44,7 @@ table_t Catalog::findTable(string tableName)
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    static table_head_t tableHd;
+    table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -71,7 +71,7 @@ attr_t Catalog::getPrimaryAttrName(string tableName)
     attr_t attrTmp;
 
     // 读出表信息头 获得表项的数目
-    static table_head_t tableHd;
+    table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -107,7 +107,7 @@ bool Catalog::tableExist(string tableName)
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    static table_head_t tableHd;
+    table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
     cout << "tableNum: " << tableNum << endl;
@@ -137,7 +137,7 @@ bool Catalog::attrExist(string tableName, string attrName)
     table_t tableTmp;
 
     // 读出表信息头 获得表项的数目
-    static table_head_t tableHd;
+    table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
 
@@ -167,12 +167,11 @@ bool Catalog::attrExist(string tableName, string attrName)
 
 void Catalog::createTable(table_t & table)
 {
-    // 更改读写指针太鸡巴了！
     fstream fs;
     fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
 
     // 读出表头 更新表头的表数目 并 写入
-    static table_head_t tableHd;
+    table_head_t tableHd;
     fs.seekg(0, ios::beg);
     readTableHead(fs, tableHd);
     tableHd.tableNum++;
@@ -192,7 +191,7 @@ void Catalog::initTable()
     fstream fout;
     fout.open(TABLE_LIST, ios::out | ios::binary);
 
-    static table_head_t tableHd;
+    table_head_t tableHd;
     tableHd.tableNum = 0;
     writeTableHead(fout, tableHd);
 
@@ -201,12 +200,11 @@ void Catalog::initTable()
 
 void Catalog::deleteTable(table_t & table)
 {
-    // 更改读写指针太鸡巴了！
     fstream fs;
     fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
 
     // 读出表头 获得表的数量
-    static table_head_t tableHd;
+    table_head_t tableHd;
     // 更改读指针
     fs.seekg(0, ios::beg);
     readTableHead(fs, tableHd);
@@ -249,6 +247,8 @@ void Catalog::deleteTable(table_t & table)
 
     fs.close();
 }
+
+/***********************************************************/
 
 void Catalog::writeTableHead(fstream & fout, table_head_t & tableHead)
 {

@@ -27,7 +27,7 @@ using namespace std;
 #define FILENAME_MAXLEN 256         /* 文件名最大长度 */
 #define MAX_CHAR_LENGTH     32      /* 最大 CHAR 类型字段长度 */
 
-#define IDXHEAD_SIZE_IN_FILE (sizeof(attr_t) + sizeof(int))
+#define IDXHEAD_SIZE_IN_FILE (ATTR_SIZE_IN_FILE + sizeof(int))
                                     /* 一个索引头在文件中所占的大小 */
 #define IDXNODE_SIZE_IN_FILE (sizeof(unsigned) + MAX_CHAR_LENGTH * sizeof(char)) 
                                     /* 一个索引节点在文件中所占的大小 */

@@ -9,25 +9,15 @@ void Index::selectIndex(string tableName, string indexName, string value, index_
     fin.open(file.c_str(), ios::in | ios::binary);
 
     // 读出索引头
-    static index_head_t idxHd;
+    index_head_t idxHd;
     readHead(fin, idxHd);
 
     // 查找索引
-    for (int i = 0; i < idxHd.recNum; i++)
-    {
-        index_node_t curIdxNode;
-        readNode(fin, curIdxNode);
-
-        // 找到了要求索引项
-        if (curIdxNode.value == value)
-        {
-            // 填写结果
-            res->value = curIdxNode.value;
-            // res->basep = curIdxNode.basep;
-            res->offset = curIdxNode.offset;
-            break;
-        }
-    }
+    // 二分查找到要求索引的起始地址
+    int pos = biSearch(fin, 1, idxHd.recNum, value, idxHd.attr.type);
+    // 读取该索引项
+    fin.seekg(pos);
+    readNode(fin, *res);
 
     fin.close();
 }
@@ -41,7 +31,7 @@ void Index::createIndex(string tableName, string indexName, attr_t & attr)
     fout.open(file.c_str(), ios::out | ios::binary);
 
     // 将索引头信息写到索引文件
-    static index_head_t idxHd;
+    index_head_t idxHd;
     idxHd.attr = attr;
     idxHd.recNum = 0;
     writeHead(fout, idxHd);
@@ -51,7 +41,6 @@ void Index::createIndex(string tableName, string indexName, attr_t & attr)
 
 void Index::insertIndex(string tableName, string indexName, index_node_t & node)
 {
-    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -59,7 +48,7 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
     fs.open(file.c_str(), ios::in | ios::out | ios::binary);
 
     // 读出索引头
-    static index_head_t idxHd;
+    index_head_t idxHd;
     readHead(fs, idxHd);
     // 记录读指针位置
     int readPos = fs.tellg();
@@ -101,7 +90,7 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
             if (lessThan(idxNode[i].value, node.value, type) &&
                 lessThan(idxNode[i + 1].value, node.value, type))
             {
-                insertPos = i;
+                insertPos = i - 1;
                 break;
             }
         }
@@ -130,7 +119,6 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
 
 void Index::deleteIndex(string tableName, string indexName, string value)
 {
-    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -138,7 +126,7 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     fs.open(file.c_str(), ios::in | ios::out | ios::binary);
 
     // 读出索引头
-    static index_head_t idxHd;
+    index_head_t idxHd;
     readHead(fs, idxHd);
     // 记录读指针位置
     int readPos = fs.tellg();
@@ -185,7 +173,6 @@ void Index::deleteIndex(string tableName, string indexName, string value)
 
 void Index::updateIndex(string tableName, string indexName, string value, string newValue)
 {
-    // 更改读写指针太鸡巴了！
     fstream fs;
 
     // 根据索引名找到索引文件
@@ -193,33 +180,61 @@ void Index::updateIndex(string tableName, string indexName, string value, string
     fs.open(file.c_str(), ios::in | ios::out | ios::binary);
 
     // 读出索引头
-    static index_head_t idxHd;
+    index_head_t idxHd;
     readHead(fs, idxHd);
 
     // 查找索引
-    int writePos = fs.tellg();      // 记录写指针位置
-    for (int i = 0; i < idxHd.recNum; i++)
-    {
-        static index_node_t curIdxNode;
-        readNode(fs, curIdxNode);
+    // 二分查找到要求索引项的起始地址
+    int pos = biSearch(fs, 1, idxHd.recNum, value, idxHd.attr.type);
+    // 读取要求索引项
+    fs.seekg(pos);
+    index_node_t curIdxNode;
+    readNode(fs, curIdxNode);
 
-        // 找到了要求索引项
-        if (curIdxNode.value == value)
-        {
-            // 更新索引项的关键码值
-            curIdxNode.value = newValue;
-
-            // 将更新了的索引项写回文件
-            // 先将写指针放到正确位置
-            fs.seekp(writePos);
-            writeNode(fs, curIdxNode);
-
-            break;
-        }
-        writePos = fs.tellg();
-    }
+    // 更新要求索引项
+    curIdxNode.value = newValue;
+    
+    // 将更新了的索引项写回文件
+    fs.seekp(pos);
+    writeNode(fs, curIdxNode);
 
     fs.close();
+}
+
+/***********************************************************/
+
+int Index::biSearch(fstream & fin, int from, int to, string value, attrtype_t type)
+{
+    index_node_t curIdxNode;
+
+    // 找到该次查询的节点
+    int mid = (from + to) / 2;
+    // 定位该次查询节点的起始地址
+    int pos = IDXHEAD_SIZE_IN_FILE + (mid - 1) * IDXNODE_SIZE_IN_FILE;
+
+    // cout << IDXHEAD_SIZE_IN_FILE << " " << IDXNODE_SIZE_IN_FILE << endl;
+    // cout << "pos: " << pos << endl;
+
+    fin.seekg(pos);
+
+    // 读取节点并比较
+    readNode(fin, curIdxNode);
+    string curValue = curIdxNode.value;
+    // 继续查询右半部分
+    if (lessThan(curValue, value, type))
+    {
+        return biSearch(fin, mid + 1, to, value, type);
+    }
+    // 继续查询左半部分
+    else if (lessThan(value, curValue, type))
+    {
+        return biSearch(fin, from, mid - 1, value, type);
+    }
+    // 找到了
+    else
+    {
+        return pos;
+    }
 }
 
 bool Index::lessThan(string value_1, string value_2, attrtype_t type)
