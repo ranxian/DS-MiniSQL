@@ -1,9 +1,6 @@
 #include "../src/MiniSQL.h"
 #include "../src/Catalog.h"
 
-// ofstream fout;
-// ifstream fin;
-
 void printAttr(attr_t & attr)
 {
     cout << "ATTR:" << endl
@@ -16,7 +13,7 @@ int main()
 {
     Catalog CatalogManager;
 
-    static table_t table;
+    table_t table;
     table.name = "Persons";
     table.attrNum = 3;
     table.recordLength = 68;
@@ -43,13 +40,13 @@ int main()
 
     // 返回主键
     cout << "返回主键：" << endl;
-    static attr_t attrTmp = CatalogManager.getPrimaryAttrName("Persons");
+    attr_t attrTmp = CatalogManager.getPrimaryAttrName("Persons");
     printAttr(attrTmp);
     cout << endl;
 
     // 返回表
     cout << "返回表：" << endl;
-    static table_t tableTmp = CatalogManager.findTable("Persons");
+    table_t tableTmp = CatalogManager.findTable("Persons");
     cout << tableTmp.name << " " << tableTmp.attrNum << " " << tableTmp.recordLength << endl;
     for (int i = 0; i < tableTmp.attrNum; i++)
     {
@@ -59,7 +56,7 @@ int main()
 
     // 返回字段
     cout << "返回字段：" << endl;
-    static attr_t attrTmp2 = CatalogManager.findAttr("Persons", "姓名");
+    attr_t attrTmp2 = CatalogManager.findAttr("Persons", "姓名");
     printAttr(attrTmp2);
     cout << endl;
 
@@ -97,8 +94,6 @@ int main()
     cout << CatalogManager.tableExist("Persons") << endl;
     cout << CatalogManager.tableExist("Students") << endl;
     cout << endl;
-
-
 
     return 0;
 }

@@ -31,7 +31,6 @@ attr_t Catalog::findAttr(string tableName, string attrName)
             break;
         }
     }
-
     fin.close();
     return attrTmp;
 }
