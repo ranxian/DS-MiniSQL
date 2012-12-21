@@ -31,6 +31,8 @@ bool Interpreter::parseCommand()
             temp = (input.substr(start,index-start));
             while ((cutIndex = temp.find_first_of(cut)) != string::npos)
             {
+                if (temp == "<>")
+                    break;
                 if (cutIndex != 0)
                     command.push_back(temp.substr(0,cutIndex));
                 command.push_back(temp.substr(cutIndex,1));
@@ -45,6 +47,8 @@ bool Interpreter::parseCommand()
             temp = (input.substr(start,index-start));
             while ((cutIndex = temp.find_first_of(cut)) != string::npos)
             {
+                if (temp == "<>")
+                    break;
                 if (cutIndex != 0)
                     command.push_back(temp.substr(0,cutIndex));
                 command.push_back(temp.substr(cutIndex,1));
@@ -214,6 +218,11 @@ bool Interpreter::parseSelect() //OK
             return false;
         }   
     }
+    if (i == 1)
+    {
+        printf("No columns selected. Please check again\n");
+        return false;
+    }
     i++;
     if (i == command.size())
     {
@@ -225,6 +234,11 @@ bool Interpreter::parseSelect() //OK
     {
         info.selectedTable.push_back(command[i]);
         i++;
+        if (i == command.size())
+        {
+            info.tree = NULL;
+            return true;
+        }
     }
     if (!strcasecmp(command[i].c_str(),"where"))
     {
