@@ -261,6 +261,65 @@ void Index::updateIndex(string tableName, string indexName, string value, string
     fs.close();
 }
 
+void Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
+{
+    index_node_t *curRes = res;
+    int resNum = 0;
+    index_node_t *lastRes;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
+    curRes->nextNode = NULL;
+
+    for (int i = 0; i < listNum; i++)
+    {
+        index_node_t *cur = list[i];
+
+        // 将 list[i] 中的节点加入结果列表
+        while (true)
+        {
+            // 查找结果列表中是否已存在当前节点
+            bool exist = false;
+            if (resNum > 0)
+            {
+                index_node_t *tmp = res;
+                for (int i = 0; i < resNum; i++)
+                {
+                    if (tmp->value == cur->value)
+                    {
+                        exist = true;
+                        break;
+                    }
+                    tmp = tmp->nextNode;
+                }
+            }
+            // 如果结果列表中不存在当前节点 才把当前节点加入结果列表
+            if (!exist)
+            {
+                curRes->value = cur->value;
+                curRes->offset = cur->offset;
+                resNum++;
+                // 在这里会导致最后多申请一个节点，需要删除之
+                curRes->nextNode = new index_node_t; 
+                lastRes = curRes;
+                curRes = curRes->nextNode;
+            }
+
+            // 若没有下一个节点 退出当前列表 合并下一个列表
+            if (cur->nextNode == NULL)
+            {
+                break;
+            }
+            // 若有下一个节点 继续合并当前列表
+            else
+            {
+                cur = cur->nextNode;
+            }
+        }
+    }
+
+    // 删除多余的一个节点
+    delete lastRes->nextNode;
+    lastRes->nextNode = NULL;
+}
+
 /***********************************************************/
 
 int Index::biSearch(fstream & fin, int from, int to, string value, attrtype_t type)

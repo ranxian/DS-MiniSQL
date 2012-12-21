@@ -21,7 +21,7 @@ public:
     void createTable(table_t & table);                  
     // 删除表 
     void deleteTable(table_t & table);
-    // 初始化表文件（写入表信息头）
+    // 初始化表文件（写入表信息头）请在建立第一个表之前调用
     void initTable();                   
 
     Catalog();

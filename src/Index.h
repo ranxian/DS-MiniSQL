@@ -23,7 +23,9 @@ public:
     // 删除关键码为 value 的索引项
     void deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
-    void updateIndex(string tableName, string indexName, string value, string newValue);          
+    void updateIndex(string tableName, string indexName, string value, string newValue);
+    // 合并多个索引项链表，结果放在 res 中
+    void mergeIndex(index_node_t **list, int listNum, index_node_t *res);          
     Index();
     ~Index();
 private:

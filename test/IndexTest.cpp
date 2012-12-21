@@ -19,7 +19,7 @@ void printNode(index_node_t * node)
 int main()
 {
     Index IndexManager;
-    index_node_t insertNode[10], res, res2;
+    index_node_t insertNode[10], res, res2, res3;
     insertNode[0].value = "1100012957";
     insertNode[0].offset = 16;
     insertNode[1].value = "1100012950";
@@ -72,5 +72,24 @@ int main()
     IndexManager.selectIndex("Persons", "学号", "1100012958", "1100012958", &res);
     printNode(&res);
     cout << endl;
+
+    // 合并索引列表
+    IndexManager.insertIndex("Persons", "学号", insertNode[2]);
+    cout << "合并索引列表：" << endl;
+    IndexManager.selectIndex("Persons", "学号", "1100012950", "1100012957", &res);
+    printNode(&res);
+    IndexManager.selectIndex("Persons", "学号", "1100012957", "1100099999", &res2);
+    printNode(&res2);
+    cout << endl;
+    index_node_t **tmp = new index_node_t * [2];
+    tmp[0] = &res;
+    tmp[1] = &res2; 
+    IndexManager.mergeIndex(tmp, 2, &res3);
+    printNode(&res3);
+    delete [] tmp;
+    cout << endl;
+
+
+
 
 }
