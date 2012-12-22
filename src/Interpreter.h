@@ -14,7 +14,9 @@ public:
     // get the result after interpretion
     info_t getInfo();                         
     // print information for debug               
-    void debug();                             
+    void debug();    
+
+    Interpreter();                         
 
 private:
     /*--------------parse different types of commands------------------*/

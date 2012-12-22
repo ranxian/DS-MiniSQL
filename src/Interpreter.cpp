@@ -2,6 +2,11 @@
 # include <string.h>
 
 
+Interpreter::Interpreter()
+{
+    info.tree = NULL;
+    info.tableName = "";
+}
 
 bool Interpreter::inputCommand()
 {
@@ -11,7 +16,7 @@ bool Interpreter::inputCommand()
 }
 
 bool Interpreter::parseCommand()
-{
+{ 
     int i, count = 0;
     clearInfo();
     size_t start, index, cutIndex;
@@ -21,12 +26,19 @@ bool Interpreter::parseCommand()
 
     start = input.find_first_not_of(seperators);
 
+
+
     /*
      * CUT the input into pieces for interprete
      * deal with ()<> carefully
      */
     while (start != string::npos)
     {
+        if (input[start] == '(')
+        {
+            command.push_back("(");
+            start = input.find_first_not_of(seperators,start+1);
+        }
         if (input[start] == '\'')
         {
             index = input.find("'", start+1)+1;
