@@ -17,7 +17,7 @@ bool Interpreter::parseCommand()
     int start, index;
     int cutIndex;
     string seperators=" , \n";
-    string cut = "()<>";
+    string cut = "()<>=";
     string temp;
 
     start = input.find_first_not_of(seperators);
@@ -25,7 +25,17 @@ bool Interpreter::parseCommand()
     // cut into pieces
     while (start != string::npos)
     {
-        index = input.find_first_of(seperators,start);
+        if (input[start] == '\'')
+        {
+            index = input.find("'", start+1)+1;
+        }
+        else if (input[start] == '"')
+        {
+            index = input.find("\"", start+1)+1;
+        }
+        else
+            index = input.find_first_of(seperators,start);
+
         if (index == string::npos)
         {
             temp = (input.substr(start,index-start));
@@ -98,9 +108,14 @@ bool Interpreter::parseCommand()
     else if (!strcasecmp(command[0].c_str(), "update"))
         return parseUpdate();
     else if (!strcasecmp(command[0].c_str(), "quit"))
+    {
+        exit(0);
         return parseQuit();
+    }
     else if (!strcasecmp(command[0].c_str(), "help"))
         return parseHelp();
+    else if (command[0] == "#")
+        return false;
     else
     {
         printf("Command '%s' invalid. Please check again.\n",command[0].c_str());
@@ -207,6 +222,11 @@ bool Interpreter::parseDrop()   //OK
 bool Interpreter::parseSelect() //OK
 {
     info.command = SELECT;
+    if (command.size() == 1)
+    {
+        printf("'select' command need more input.\n");
+        return false;
+    }
     int i = 1;
     while (strcasecmp(command[i].c_str(),"from"))
     {
@@ -220,7 +240,7 @@ bool Interpreter::parseSelect() //OK
     }
     if (i == 1)
     {
-        printf("No columns selected. Please check again\n");
+        printf("No columns selected. Please check again.\n");
         return false;
     }
     i++;
@@ -298,6 +318,11 @@ bool Interpreter::parseInsert()  //OK
     info.tableName = command[2];
     int index1 ,index2;
     index1 = index2 = 4;
+    /*
+     * bound checking needed here
+     * not added yet
+     *
+     */
     while (command[index2] != "(")
     {
         index2++;
@@ -333,7 +358,7 @@ bool Interpreter::parseUpdate() //OK
         return false;
     }
     info.tableName = command[1];
-    if (command.size() <= 6 )
+    if (command.size() < 6 )
     {
         printf("Systax error. Update command needs more input\n");
         return false;
@@ -381,7 +406,7 @@ condition_tree_t * Interpreter::makeTree(int index)
         {
             ptr->leftOperand = command[i];
             i++;
-            if (command[i] == "==")
+            if (command[i] == "=")
                 ptr->opName = EQ;
             else if (command[i] == "<>")
                 ptr->opName = NE;
@@ -393,6 +418,11 @@ condition_tree_t * Interpreter::makeTree(int index)
                 ptr->opName = GTE;
             else if (command[i] == "<=")
                 ptr->opName = LTE;
+            else
+            {
+                printf("Syntax error in condition expression.\n" );
+                return NULL;
+            }
             i++;
             if (i == command.size())
             {

@@ -1,0 +1,33 @@
+# Test trace for interpreter;
+# Add whatever you want and Let ZQM deal with bugs;
+# run it with "./itptest < Interpreter_test_trace.trace";
+
+create table Person
+(
+id int,
+name char,
+sex char,
+);
+
+drop table address;
+
+select address.city, address.street_no, travel.city from address, travel;
+
+insert into address (city, street_no) values ('New York', 5);
+
+delete from address where street_no < 5;
+
+update address set street_no = 2 where city = 'New York';
+
+
+
+
+
+# You can also add some error input;
+
+select from t where a > ;
+
+
+
+# Do not change the quit;
+quit;

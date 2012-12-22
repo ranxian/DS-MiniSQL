@@ -1,6 +1,6 @@
-#include "API.h"
-#include "MiniSQL.h"
-#include "Interpreter.h"
+#include "../src/API.h"
+#include "../src/MiniSQL.h"
+#include "../src/Interpreter.h"
 
 int main()
 {
@@ -8,7 +8,10 @@ int main()
     while(1)
     {
         if (itp.inputCommand())
-         itp.debug();
+        {
+            itp.debug();
+        }
+        printf("\n");
     }
 
     return 0;
