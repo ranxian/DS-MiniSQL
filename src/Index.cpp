@@ -1,6 +1,6 @@
 #include "Index.h"
 
-void Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
+int Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
 {
     fstream fin;
 
@@ -71,9 +71,12 @@ void Index::selectIndex(string tableName, string indexName, string valueFrom, st
     }
 
     fin.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::createIndex(string tableName, string indexName, attr_t & attr)
+int Index::createIndex(string tableName, string indexName, attr_t & attr)
 {
     fstream fout;
 
@@ -88,9 +91,12 @@ void Index::createIndex(string tableName, string indexName, attr_t & attr)
     writeHead(fout, idxHd);
 
     fout.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::insertIndex(string tableName, string indexName, index_node_t & node)
+int Index::insertIndex(string tableName, string indexName, index_node_t & node)
 {
     fstream fs;
 
@@ -175,9 +181,12 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
     }
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::deleteIndex(string tableName, string indexName, string value)
+int Index::deleteIndex(string tableName, string indexName, string value)
 {
     fstream fs;
 
@@ -229,9 +238,12 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     delete [] idxNode;
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::updateIndex(string tableName, string indexName, string value, string newValue)
+int Index::updateIndex(string tableName, string indexName, string value, string newValue)
 {
     fstream fs;
 
@@ -259,9 +271,12 @@ void Index::updateIndex(string tableName, string indexName, string value, string
     writeNode(fs, curIdxNode);
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
+int Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;
@@ -318,6 +333,9 @@ void Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
     // 删除多余的一个节点
     delete lastRes->nextNode;
     lastRes->nextNode = NULL;
+
+    // 成功返回 0
+    return 0;
 }
 
 /***********************************************************/
@@ -383,7 +401,10 @@ int Index::biSearchFrom(fstream & fin, int from, int to, string value, attrtype_
     else if (lessThan(value, curValue, type))
     {
         return biSearchFrom(fin, from, mid - 1, value, type);
-    } else {
+    } 
+    // 表现正常是不会到这儿的
+    else 
+    {
         return -1;
     }
 }
@@ -426,7 +447,10 @@ int Index::biSearchTo(fstream & fin, int from, int to, string value, attrtype_t 
     else if (lessThan(value, curValue, type))
     {
         return biSearchTo(fin, from, mid - 1, value, type);
-    } else {
+    } 
+    // 表现正常是不会到这儿的
+    else 
+    {
         return -1;
     }
 }

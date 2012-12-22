@@ -12,7 +12,7 @@ public:
     // 返回要求的表的信息
     table_t findTable(string tableName);                  
     // 返回主键的字段信息（然后去找索引）
-    attr_t getPrimaryAttrName(string tableName);                               
+    attr_t getPrimaryAttr(string tableName);                               
     // 返回表是否存在
     bool tableExist(string tableName);                  
     // 返回表是否存在该字段

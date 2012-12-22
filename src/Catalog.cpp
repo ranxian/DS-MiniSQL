@@ -61,7 +61,7 @@ table_t Catalog::findTable(string tableName)
     return tableTmp;
 }
 
-attr_t Catalog::getPrimaryAttrName(string tableName)
+attr_t Catalog::getPrimaryAttr(string tableName)
 {
     fstream fin;
     fin.open(TABLE_LIST, ios::in | ios::binary);
@@ -234,7 +234,7 @@ int Catalog::deleteTable(table_t & table)
     delete [] tables;
 
     fs.close();
-    
+
     // 成功返回 0
     return 0;
 }
