@@ -24,3 +24,9 @@ interpreter.o: Interpreter.cpp Interpreter.h
 	$(CXX) $(CPPFLAGS) -c Interpreter.cpp
 record.o: Record.cpp Record.h
 	$(CXX) $(CPPFLAGS) -c Record.cpp
+
+clean:
+	rm -f *.o minisql ../data/*.idx ../data/table.list
+
+cleand:
+	rm -f ../data/*
