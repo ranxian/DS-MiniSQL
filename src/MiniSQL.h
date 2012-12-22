@@ -43,7 +43,8 @@ using namespace std;
 /* 字段类型 */
 typedef enum {
     CHAR,
-    INT
+    INT,
+    NOATTR                                   //表示该字段的值为空
 } attrtype_t;
 
 /* 表与字段的结构 */
@@ -152,6 +153,7 @@ struct value_t
     attrtype_t type;
     string str_value;
     int int_value;
+    value_t *next;
 };
 /* 记录类型 */
 struct record_t
