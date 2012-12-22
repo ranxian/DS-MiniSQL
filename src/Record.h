@@ -11,7 +11,7 @@
 class Record
 {
 public:
-    Record();
+    Record(){};
     ~Record(){};
     int Insert(info_t & insert_info);
     void Delete(info_t & delete_info, index_node_t & index);
@@ -27,9 +27,6 @@ private:
     /* 根据表信息和字段名返回字段值类型等信息，0表示整形，1表示字符串，-1表示不存在此字段，Offset表示
     所查找字段相对与当前记录首地址的偏移，attriLength表示这个字段值的字节数 */
     int getInfo(table_t table, string infoName, int &Offset, int &attriLength);
-
-    
-
 
 };
 
