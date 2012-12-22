@@ -18,9 +18,9 @@ public:
     // 返回表是否存在该字段
     bool attrExist(string tableName, string attrName); 
     // 建表  
-    void createTable(table_t & table);                  
+    int createTable(table_t & table);                  
     // 删除表 
-    void deleteTable(table_t & table);           
+    int deleteTable(table_t & table);           
 
     Catalog();
     ~Catalog();

@@ -162,7 +162,7 @@ bool Catalog::attrExist(string tableName, string attrName)
     return exist;
 }
 
-void Catalog::createTable(table_t & table)
+int Catalog::createTable(table_t & table)
 {
     fstream fs;
     fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
@@ -181,9 +181,12 @@ void Catalog::createTable(table_t & table)
     writeTable(fs, table);
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Catalog::deleteTable(table_t & table)
+int Catalog::deleteTable(table_t & table)
 {
     fstream fs;
     fs.open(TABLE_LIST, ios::in | ios::out | ios::binary);
@@ -231,6 +234,9 @@ void Catalog::deleteTable(table_t & table)
     delete [] tables;
 
     fs.close();
+    
+    // 成功返回 0
+    return 0;
 }
 
 /***********************************************************/
