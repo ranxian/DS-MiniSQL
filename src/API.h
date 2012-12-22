@@ -5,6 +5,7 @@
 #include "Catalog.h"
 #include "Interpreter.h"
 #include "Record.h"
+#include "Index.h"
 class Index;
 class API
 {
@@ -21,12 +22,16 @@ public:
     int select();
     // 插入
     int insert();
+    // 更新
+    int update();
     // 删除数据
     int deleteRecord();
     // 从标准输入读
     int getInput();
     // 退出
     int exit();
+    // 帮助
+    void help();
     // 命令类型
     cmd_t commandType();
 private:

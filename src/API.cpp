@@ -3,6 +3,9 @@
 API::API() 
 {
     interpreter = new Interpreter;
+    catalog_manager = new Catalog;
+    index_manager = new Index;
+    record_manager = new Record;
 }
 
 API::~API()
@@ -11,11 +14,20 @@ API::~API()
 }
 
 int API::createTable() {
-    return -1;
+    info_t info;
+
+    info = interpreter->getInfo();
+    string tableName = info.tableName;
+
+    if (catalog_manager->tableExist(tableName)) {
+        return -1;
+    } else {
+        catalog_manager->createTable(info.t);
+    }
 }
 
 int API::createIndex() {
-    return -1;
+
 }
 
 int API::select() {
@@ -40,6 +52,14 @@ int API::getInput() {
 }
 
 int API::exit() {
+    return -1;
+}
+
+void API::help() {
+    printf("This is the manul\n");
+}
+
+int API::update() {
     return -1;
 }
 
