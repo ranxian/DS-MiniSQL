@@ -97,7 +97,7 @@ typedef enum {
     DELETE_INDEX,   // 删索引 - 不急着做
     UPDATE,         // 更新记录
     SELECT,         // 查记录
-    INSERT,
+    INSERT,         // 插入记录
     DELETE,         // 删记录
     QUIT,           // 退出程序
     HELP            // 打印帮助文档 - 不急着做
@@ -119,6 +119,7 @@ struct condition_tree_t
 struct info_t {
     cmd_t command;
     string tableName;                       // 命令相关的表名
+    string indexName;                       // 索引相关操作的索引名
     table_t t;                              // 命令相关的表信息
     std::vector<string> selectedItems;      // select 语句中被选择的字段
     std::vector<string> selectedTable;      // select 语句中被选择的Table

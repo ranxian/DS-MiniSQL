@@ -182,7 +182,7 @@ int Record::Insert(info_t & insert_info)
     
     /* 根据表明生成文件名 */
     string Filename;
-    Filename = "\"" + insert_info.tableName + ".rec\"";
+    Filename = "../data/" + insert_info.tableName + ".rec";
 
     //filename即为表名处理过的字符串
     char *filename = (char *)Filename.c_str();                  

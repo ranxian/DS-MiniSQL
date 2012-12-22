@@ -9,10 +9,12 @@ int main()
     printf("+-------------------------+\n");
     while(1)
     {
-        switch (api.getInput()) {
+        api.getInput();
+        switch (api.commandType()) {
             case NONE:
                 break;
             case CREATE_TABLE:
+                api.createTable();
                 break;
             case DROP_TABLE:
                 api.dropTable();
