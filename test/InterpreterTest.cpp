@@ -1,6 +1,6 @@
-#include "API.h"
-#include "MiniSQL.h"
-#include "Interpreter.h"
+#include "../src/API.h"
+#include "../src/MiniSQL.h"
+#include "../src/Interpreter.h"
 
 int main()
 {
