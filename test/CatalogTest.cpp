@@ -30,9 +30,6 @@ int main()
     table.attributes[2].length = 8;
     table.attributes[2].type = INT;
 
-    // 初始化表
-    CatalogManager.initTable();
-
     // 建表
     cout << "建表：" << endl;
     CatalogManager.createTable(table);

@@ -109,13 +109,11 @@ bool Catalog::tableExist(string tableName)
     table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
-    cout << "tableNum: " << tableNum << endl;
 
     // 查找是否存在表名为 tableName 的表项
     for (int i = 0; i < tableNum; i++)
     {
         readTable(fin, tableTmp);
-        cout << "tableName: " << tableTmp.name << endl;
         if (tableTmp.name == tableName)
         {
             exist = true;
@@ -185,18 +183,6 @@ void Catalog::createTable(table_t & table)
     fs.close();
 }
 
-void Catalog::initTable()
-{
-    fstream fout;
-    fout.open(TABLE_LIST, ios::out | ios::binary);
-
-    table_head_t tableHd;
-    tableHd.tableNum = 0;
-    writeTableHead(fout, tableHd);
-
-    fout.close();
-}
-
 void Catalog::deleteTable(table_t & table)
 {
     fstream fs;
@@ -248,6 +234,18 @@ void Catalog::deleteTable(table_t & table)
 }
 
 /***********************************************************/
+
+void Catalog::initTable()
+{
+    fstream fout;
+    fout.open(TABLE_LIST, ios::out | ios::binary);
+
+    table_head_t tableHd;
+    tableHd.tableNum = 0;
+    writeTableHead(fout, tableHd);
+
+    fout.close();
+}
 
 void Catalog::writeTableHead(fstream & fout, table_head_t & tableHead)
 {
@@ -306,7 +304,7 @@ void Catalog::readAttr(fstream & fin, attr_t & attr)
 
 Catalog::Catalog()
 {
-
+    initTable();
 }
 
 Catalog::~Catalog()
