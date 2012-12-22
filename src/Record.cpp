@@ -38,8 +38,7 @@ int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLengt
         }
     }
 
-    if (i == table.attrNum)
-        return -1;
+    return -1;
 }
 
 /* 用来某一条记录是否符合条件树的要求，返回值为1则表示符合要求，返回0表示不符合要求，返回-1表示
@@ -62,12 +61,9 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                 Judge(tempCondition->right, offset, table, input));
 
         //如果逻辑符号为或的情况
-        else if (tempCondition->logic == OR)
-            return (Judge(tempCondition->left, offset, table, input) | 
+        else return (Judge(tempCondition->left, offset, table, input) | 
                 Judge(tempCondition->right, offset, table, input));
     }
-
-   
     //剩下的情况就认为是叶节点，即判断单元
     else
     {
@@ -82,9 +78,6 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
         char outChar[MAX_CHAR_LENGTH];
         memset(outChar, 0, sizeof outChar);
         
-        
-
-
         //剩下的情况字段值都不为空
         //要判断字符串的情况,此时应该只有等于和不等于两种情况？
         if (getInfo(table, tempCondition->leftOperand, attriOffset, attriLength) == 1)
@@ -113,18 +106,11 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                         return 0;
                     else 
                         return 1;
-
-
             }
-            
-
         }
-
-
         //此种情况为比较整型变量
         else if(getInfo(table, tempCondition->leftOperand, attriOffset, attriLength) == 0)
         {
-            
             //定位到相应的字段值首地址
             input.seekg(offset + attriOffset, ios::beg);
             input.read((char *)outChar, attriLength);
@@ -132,21 +118,18 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
             string out = outChar;
             if (out == "oop")
                 return -1;
-
-
             //将字段值取出，以整形存储
             int outInt = 0;
             //定位到相应的字段值首地址
             input.seekg(offset + attriOffset, ios::beg);
-            input.read((char *)&outInt, attriLength);
 
+            input.read((char *)&outInt, attriLength);
             //将右值rightOperand转换为整型值
             char *rightNum = (char *)tempCondition->rightOperand.c_str();
             int rightnum = atoi(rightNum);
 
             switch (tempCondition->opName)
             {
-                
                 case EQ:
                     if (outInt == rightnum)
                         return 1;
@@ -189,14 +172,11 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                         return 0;
             }
         }
-
-
         //此种情况说明它的左操作数（及字段名）根本不存在
         else 
             return -1;
     }
-        
-
+    return -1;
 }
 
 /* Insert函数返回最后一条记录相对文件头的偏移量 */

@@ -14,8 +14,7 @@ bool Interpreter::parseCommand()
 {
     int i, count = 0;
     clearInfo();
-    int start, index;
-    int cutIndex;
+    size_t start, index, cutIndex;
     string seperators=" , \n";
     string cut = "()<>";
     string temp;
@@ -66,7 +65,7 @@ bool Interpreter::parseCommand()
     }
     */
     
-    for (i = 0; i < command.size(); i++)
+    for (i = 0; i < (int)command.size(); i++)
     {
         if (command[i] == "(")
             count++;
@@ -128,7 +127,7 @@ bool Interpreter::parseCreate() // OK
     info.t.name = command[2];
     while (command[i] != ")")
     {
-        if (i == command.size())
+        if (i == (int)command.size())
         {
             printf("Syntax error in Create cmmand. (Forget the ')' ?)\n");
             return false;
@@ -212,7 +211,7 @@ bool Interpreter::parseSelect() //OK
     {
         info.selectedItems.push_back(command[i]);
         i++; 
-        if (i == command.size())
+        if (i == (int)command.size())
         {
             printf("Systax error: No talbe specified\n");
             return false;
@@ -224,7 +223,7 @@ bool Interpreter::parseSelect() //OK
         return false;
     }
     i++;
-    if (i == command.size())
+    if (i == (int)command.size())
     {
         printf("Systax error: No talbe specified\n");
         return false;
@@ -234,7 +233,7 @@ bool Interpreter::parseSelect() //OK
     {
         info.selectedTable.push_back(command[i]);
         i++;
-        if (i == command.size())
+        if (i == (int)command.size())
         {
             info.tree = NULL;
             return true;
@@ -301,7 +300,7 @@ bool Interpreter::parseInsert()  //OK
     while (command[index2] != "(")
     {
         index2++;
-        if (index2 == command.size())
+        if (index2 == (int)command.size())
         {
             printf("Systax error in insert command. Please check again.\n");
             return false;
@@ -315,7 +314,7 @@ bool Interpreter::parseInsert()  //OK
         index1++;
         index2++;
         //printf("%d %d\n",index1, index2 );
-        if (index2 == command.size())
+        if (index2 == (int)command.size())
         {
             printf("Systax error in insert command. Please check again.\n");
             return false;
@@ -358,9 +357,9 @@ condition_tree_t * Interpreter::makeTree(int index)
     std::stack<condition_tree_t *> atom;
     std::stack<condition_tree_t *> logic;
     condition_tree_t * ptr;
-    int i,j,k;
+    int i;
     i = index;
-    while (i < command.size())
+    while (i < (int)command.size())
     {
         ptr = new condition_tree_t();
         if (!strcasecmp(command[i].c_str(),"and"))
@@ -394,7 +393,7 @@ condition_tree_t * Interpreter::makeTree(int index)
             else if (command[i] == "<=")
                 ptr->opName = LTE;
             i++;
-            if (i == command.size())
+            if (i == (int)command.size())
             {
                 printf("Syntax error in condition expression.\n");
                 return NULL;
@@ -450,10 +449,10 @@ void Interpreter::debug()
     if (info.command == SELECT)
     {
         printf("selected items:\n");
-        for (i = 0; i < info.selectedItems.size();i++)
+        for (i = 0; i < (int)info.selectedItems.size();i++)
             printf("%s\n",info.selectedItems[i].c_str() );
         printf("selected table:\n");
-        for (i = 0; i < info.selectedTable.size();i++)
+        for (i = 0; i < (int)info.selectedTable.size();i++)
             printf("%s\n",info.selectedTable[i].c_str() );
         printf("Condition tree:\n");
         showConditionTree(info.tree);

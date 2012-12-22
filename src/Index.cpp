@@ -383,6 +383,8 @@ int Index::biSearchFrom(fstream & fin, int from, int to, string value, attrtype_
     else if (lessThan(value, curValue, type))
     {
         return biSearchFrom(fin, from, mid - 1, value, type);
+    } else {
+        return -1;
     }
 }
 
@@ -424,6 +426,8 @@ int Index::biSearchTo(fstream & fin, int from, int to, string value, attrtype_t 
     else if (lessThan(value, curValue, type))
     {
         return biSearchTo(fin, from, mid - 1, value, type);
+    } else {
+        return -1;
     }
 }
 
