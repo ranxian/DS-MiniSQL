@@ -24,10 +24,11 @@ int API::createTable() {
     } else {
         catalog_manager->createTable(info.t);
     }
+    return 0;
 }
 
 int API::createIndex() {
-
+    return -1;
 }
 
 int API::select() {
