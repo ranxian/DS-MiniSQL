@@ -11,6 +11,8 @@ sex char,
 
 drop table address;
 
+select * from t;
+
 select address.city, address.street_no, travel.city from address, travel;
 
 insert into address (city, street_no) values ('New York', 5);
