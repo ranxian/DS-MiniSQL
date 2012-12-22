@@ -109,13 +109,11 @@ bool Catalog::tableExist(string tableName)
     table_head_t tableHd;
     readTableHead(fin, tableHd);
     int tableNum = tableHd.tableNum;
-    cout << "tableNum: " << tableNum << endl;
 
     // 查找是否存在表名为 tableName 的表项
     for (int i = 0; i < tableNum; i++)
     {
         readTable(fin, tableTmp);
-        cout << "tableName: " << tableTmp.name << endl;
         if (tableTmp.name == tableName)
         {
             exist = true;
