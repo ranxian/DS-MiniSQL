@@ -55,6 +55,8 @@ int main()
     printNode(&res);
     IndexManager.selectIndex("Persons", "学号", "1100012952", "1100099999", &res);
     printNode(&res);
+    IndexManager.selectIndex("Persons", "学号", "ZHAODIAO", "ZHAODIAO", &res);
+    printNode(&res);
     cout << endl;
 
     // 删除索引项

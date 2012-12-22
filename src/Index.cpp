@@ -16,33 +16,43 @@ int Index::selectIndex(string tableName, string indexName, string valueFrom, str
     // 二分查找到要求索引的起始、结束地址
     int from;
     int to;
-    // 如果查找范围最小值不比第一个索引值大，那么从第一个索引开始收集
-    index_node_t firstNode;
-    fin.seekg(IDXHEAD_SIZE_IN_FILE);
-    readNode(fin, firstNode);
-    if (!lessThan(firstNode.value, valueFrom, idxHd.attr.type))
+    // 如果是要取出所有索引的话
+    if (valueFrom == "ZHAODIAO" && valueTo == "ZHAODIAO")
     {
         from = IDXHEAD_SIZE_IN_FILE;
-    }
-    // 否则，进行二分查找
-    else
-    {
-        fin.seekg(IDXHEAD_SIZE_IN_FILE);
-        from = biSearchFrom(fin, 1, idxHd.recNum, valueFrom, idxHd.attr.type);
-    }
-    // 如果查找范围最大值不比最后一个索引值小，那么收集到最后一个索引
-    index_node_t lastNode;
-    fin.seekg(IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE);
-    readNode(fin, lastNode);
-    if (!lessThan(valueTo, lastNode.value, idxHd.attr.type))
-    {
         to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
     }
-    // 否则，进行二分查找
+    // 否则
     else
     {
+        // 如果查找范围最小值不比第一个索引值大，那么从第一个索引开始收集
+        index_node_t firstNode;
         fin.seekg(IDXHEAD_SIZE_IN_FILE);
-        to = biSearchTo(fin, 1, idxHd.recNum, valueTo, idxHd.attr.type);
+        readNode(fin, firstNode);
+        if (!lessThan(firstNode.value, valueFrom, idxHd.attr.type))
+        {
+            from = IDXHEAD_SIZE_IN_FILE;
+        }
+        // 否则，进行二分查找
+        else
+        {
+            fin.seekg(IDXHEAD_SIZE_IN_FILE);
+            from = biSearchFrom(fin, 1, idxHd.recNum, valueFrom, idxHd.attr.type);
+        }
+        // 如果查找范围最大值不比最后一个索引值小，那么收集到最后一个索引
+        index_node_t lastNode;
+        fin.seekg(IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE);
+        readNode(fin, lastNode);
+        if (!lessThan(valueTo, lastNode.value, idxHd.attr.type))
+        {
+            to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
+        }
+        // 否则，进行二分查找
+        else
+        {
+            fin.seekg(IDXHEAD_SIZE_IN_FILE);
+            to = biSearchTo(fin, 1, idxHd.recNum, valueTo, idxHd.attr.type);
+        }
     }
 
     // cout << "--------------from: " << from << " to: " << to << endl;
