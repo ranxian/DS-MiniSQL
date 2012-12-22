@@ -185,18 +185,6 @@ void Catalog::createTable(table_t & table)
     fs.close();
 }
 
-void Catalog::initTable()
-{
-    fstream fout;
-    fout.open(TABLE_LIST, ios::out | ios::binary);
-
-    table_head_t tableHd;
-    tableHd.tableNum = 0;
-    writeTableHead(fout, tableHd);
-
-    fout.close();
-}
-
 void Catalog::deleteTable(table_t & table)
 {
     fstream fs;
@@ -248,6 +236,18 @@ void Catalog::deleteTable(table_t & table)
 }
 
 /***********************************************************/
+
+void Catalog::initTable()
+{
+    fstream fout;
+    fout.open(TABLE_LIST, ios::out | ios::binary);
+
+    table_head_t tableHd;
+    tableHd.tableNum = 0;
+    writeTableHead(fout, tableHd);
+
+    fout.close();
+}
 
 void Catalog::writeTableHead(fstream & fout, table_head_t & tableHead)
 {
@@ -306,7 +306,7 @@ void Catalog::readAttr(fstream & fin, attr_t & attr)
 
 Catalog::Catalog()
 {
-
+    initTable();
 }
 
 Catalog::~Catalog()
