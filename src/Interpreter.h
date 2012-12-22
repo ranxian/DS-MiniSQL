@@ -27,13 +27,17 @@ private:
     bool parseQuit();
     bool parseHelp();           
     bool parseDrop();  
-    /*-----------------------------------------------------*/         
-    void clearInfo();           // clear all info before rewriting
-    void showConditionTree(condition_tree_t * root);
+    /*-----------------------------------------------------*/    
+    // clear all info before rewriting     
+    void clearInfo();           
+    // show details of condition tree
+    void showConditionTree(condition_tree_t * root);  
+    // destruct the condition tree 
     void clearTree(condition_tree_t * root);
     string input;                                                   // command input by user
     std::vector<string> command;                                    // parsed command 
-    info_t info;                // infomation interpreted by Interpreter
+    info_t info;                                                    // infomation interpreted by Interpreter
+    // make condition tree with given input
     condition_tree_t * makeTree(int index);
 };
 #endif

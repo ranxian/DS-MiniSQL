@@ -23,9 +23,22 @@ update address set street_no = 2 where city = 'New York';
 
 
 
-# You can also add some error input;
+# You can also add some error input to make it more robust;
 
-select from t where a > ;
+select * from t where a > ;
+
+select from t where a >;
+
+create talbe t
+(
+id short
+);
+
+creat table t
+(
+id int,
+name char
+);
 
 
 
