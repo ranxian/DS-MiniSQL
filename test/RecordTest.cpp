@@ -1,18 +1,11 @@
 #include "../src/MiniSQL.h"
-#include "../src/Catalog.h"
+#include "../src/Record.h"
 
-void printAttr(attr_t & attr)
-{
-    cout << "ATTR:" << endl
-        << " " << attr.name << endl 
-        << " " << attr.isPrimary << endl 
-        << " " << attr.length << endl
-        << " " << attr.type <<  endl;
-}
+
 int main()
 {
-    Catalog CatalogManager;
-
+    Record testRecord;
+    
     table_t table;
     table.name = "Persons";
     table.attrNum = 3;
@@ -30,6 +23,11 @@ int main()
     table.attributes[2].length = 8;
     table.attributes[2].type = INT;
 
+    testRecord.PrintHead(table);
+    /*
+    // 初始化表
+    CatalogManager.initTable();
+
     // 建表
     cout << "建表：" << endl;
     CatalogManager.createTable(table);
@@ -37,7 +35,7 @@ int main()
 
     // 返回主键
     cout << "返回主键：" << endl;
-    attr_t attrTmp = CatalogManager.getPrimaryAttr("Persons");
+    attr_t attrTmp = CatalogManager.getPrimaryAttrName("Persons");
     printAttr(attrTmp);
     cout << endl;
 
@@ -77,9 +75,7 @@ int main()
 
     // 字段存在
     cout << "字段存在：" << endl;
-    cout << "我想找 Students 中的 '学号' 字段" << endl;
     cout << CatalogManager.attrExist("Students", "学号") << endl;
-    cout << "我想找 Students 中的 '什么鸟啊' 字段" << endl;
     cout << CatalogManager.attrExist("Students", "什么鸟啊") << endl;
     cout << endl;
 
@@ -93,6 +89,7 @@ int main()
     cout << CatalogManager.tableExist("Persons") << endl;
     cout << CatalogManager.tableExist("Students") << endl;
     cout << endl;
+    */
 
     return 0;
 }

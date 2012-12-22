@@ -43,7 +43,8 @@ using namespace std;
 /* 字段类型 */
 typedef enum {
     CHAR,
-    INT
+    INT,
+    NOATTR                                   //表示该字段的值为空
 } attrtype_t;
 
 /* 表与字段的结构 */
@@ -96,7 +97,7 @@ typedef enum {
     DELETE_INDEX,   // 删索引 - 不急着做
     UPDATE,         // 更新记录
     SELECT,         // 查记录
-    INSERT,
+    INSERT,         // 插入记录
     DELETE,         // 删记录
     QUIT,           // 退出程序
     HELP            // 打印帮助文档 - 不急着做
@@ -118,6 +119,7 @@ struct condition_tree_t
 struct info_t {
     cmd_t command;
     string tableName;                       // 命令相关的表名
+    string indexName;                       // 索引相关操作的索引名
     table_t t;                              // 命令相关的表信息
     std::vector<string> selectedItems;      // select 语句中被选择的字段
     std::vector<string> selectedTable;      // select 语句中被选择的Table
@@ -133,7 +135,9 @@ struct index_node_t
     // void *basep;     // 内存中的基地址
     unsigned offset;    // basep 的偏移
 
-    // index_node_t *nextNode;
+    index_node_t *nextNode;     // ！！强烈注意：该指针在写入文件的时候不会写入，在读出文件的时候不会读出
+                                //              其作用只是在 select 时，返回一个索引项的链表（因为有时
+                                //              查询值是一个范围）
 };
 
 /* 索引头 */
@@ -150,6 +154,7 @@ struct value_t
     attrtype_t type;
     string str_value;
     int int_value;
+    value_t *next;
 };
 /* 记录类型 */
 struct record_t
