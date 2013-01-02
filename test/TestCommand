@@ -1,16 +1,16 @@
 Create:
-    create table address(city char, street_no int);
-    create table address(id int primary key, city char, street_no int );
+    create table address ( city char, street_no int );
+    create table address ( id int primary key, city char, street_no int );
 
 Select:
     select * from address;
     select city, street_no from address;
     Select city, street_no from address where street_no = 5;
-    select name from address where city = 'New York';
-    select name from address where city = 'New York' and steet_no = 5;
+    select city from address where city = 'New York';
+    select city from address where city = 'New York' and street_no = 5;
 
 Insert:
-    insert into address (city, street_no) values ('New York', 5);
+    insert into address ( city, street_no ) values ( 'New York', 5 );
 
 Update:
     update address set street_no = 1;
@@ -18,10 +18,30 @@ Update:
 
 Delete:
     delete from address;
-    delete from address where street_no < 5;
+    delete from address where street_no <= 5;
 
 Drop:
     drop table address;
 
 
 Quit:
+
+Integrate:
+
+create table address ( city char, street_no int );
+insert into address ( city, street_no ) values ( 'New York', 5 );
+insert into address ( city, street_no ) values ( 'New York', 10 );
+select city from address where city = 'New York';
+Select city, street_no from address where street_no = 5;
+select city from address where city = 'New York' and street_no = 5;
+
+select * from address;
+// 下面这条只输出了一个结果
+select city from address where street_no > 1;
+
+// 下面这三条有问题
+update address set street_no = 2 where city = 'New York';
+delete from address where street_no < 7;
+delete from address;
+
+drop table address;

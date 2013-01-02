@@ -42,6 +42,8 @@ int API::createIndex() {
     return 0;
 }
 
+// V
+// 打印多条记录
 int API::select() {
     info_t info = interpreter->getInfo();
     table_t table = info.t;
@@ -53,6 +55,7 @@ int API::select() {
     return 0;
 }
 
+// V
 int API::insert() {
     info_t info = interpreter->getInfo();
 
@@ -61,6 +64,7 @@ int API::insert() {
     return 0;
 }
 
+// V
 int API::dropTable() {
     info_t info = interpreter->getInfo();
 
@@ -69,38 +73,46 @@ int API::dropTable() {
     return 0;
 }
 
+// no sign to delete
 int API::deleteRecord() {
     info_t info = interpreter->getInfo();
-    index_node_t *res;
-    string indexName = catalog_manager->getPrimaryAttr(info.tableName).name;
-    index_manager->selectIndex(
-        info.tableName, 
-        indexName,
-        "ZHAODIAO",
-        "ZHAODIAO",
-        res
-    );
-    record_manager->Delete(info, *res);
+    index_node_t res;
+    // string indexName = catalog_manager->getPrimaryAttr(info.tableName).name;
+    // index_manager->selectIndex(
+    //     info.tableName, 
+    //     indexName,
+    //     "ZHAODIAO",
+    //     "ZHAODIAO",
+    //     res
+    // );
+    record_manager->Delete(info, res);
 
     return -1;
 }
 
+// V
 int API::getInput() {
     if (interpreter->inputCommand())
         return 0;
     else return -1;
 }
 
+// V
 int API::exit() {
     return -1;
 }
 
+// V
 void API::help() {
     printf("This is the manul\n");
 }
 
 int API::update() {
-    return -1;
+    info_t info = interpreter->getInfo();
+    index_node_t res;
+
+    record_manager->Update(info, res);
+    return 0;
 }
 
 cmd_t API::commandType() {
