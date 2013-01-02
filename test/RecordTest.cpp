@@ -13,14 +13,44 @@ int main()
     Record Test;
     info_t testInfo;
     record_t *testRecord;
-    
+    while (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        if (testInfo.command == CREATE_TABLE)
+        {
+            Test.PrintHead(testInfo.t);
+        }
+        else if (testInfo.command == SELECT)
+        {
+            testRecord = Test.Select(testInfo);
+            //cout << "record selected successfully!" << endl;
+            if (testRecord != NULL)
+            {
+                Test.Print(testRecord);
+            }
+            else
+            {
+                cout << "record not found!!" << endl;
+            }
+        }
+        else if (testInfo.command == INSERT)
+        {
+            Test.Insert(testInfo);
+        }
+        else
+        {
+            ;
+        }
+    }
+
+    /*
     //建表，输出表字段信息
     if (itp.inputCommand())
     {
         testInfo = itp.getInfo();
     //Test.Insert(testInfo);
         Test.PrintHead(testInfo.t);
-        cout << "table built successfully!" << endl;
+        //cout << "table built successfully!" << endl;
     }
     
 
@@ -28,8 +58,9 @@ int main()
     if (itp.inputCommand())
     {
         testInfo = itp.getInfo();
-        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
-        cout << "record inserted successfully!"  << endl;
+        Test.Insert(testInfo);
+        //cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        //cout << "record inserted successfully!"  << endl;
     }
     
     //Test.Print(testRecord);
@@ -38,8 +69,10 @@ int main()
     if (itp.inputCommand())
     {
         testInfo = itp.getInfo();
-        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
-        cout << "record inserted successfully!"  << endl;
+        Test.Insert(testInfo);
+
+        //cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        //cout << "record inserted successfully!"  << endl;
     }
     
 
@@ -49,7 +82,7 @@ int main()
         testInfo = itp.getInfo();
         //itp.debug(); 
         testRecord = Test.Select(testInfo);
-        cout << "record selected successfully!" << endl;
+        //cout << "record selected successfully!" << endl;
         if (testRecord != NULL)
         {
             Test.Print(testRecord);
@@ -63,7 +96,7 @@ int main()
 
     }
     
-
+    */
 
     /*
     while(1)

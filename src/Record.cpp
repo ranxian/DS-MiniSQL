@@ -211,7 +211,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
         else 
             return -1;
     }
-    return -1;
+    
 }
 
 /* Insert函数返回最后一条记录相对文件头的偏移量 */
@@ -228,6 +228,7 @@ int Record::Insert(info_t & insert_info)
 
     ofstream output;
     output.open(filename, ios::binary|ios::out|ios::app);
+
     //output.open(filename, ios::app|ios::binary|ios::out);
     //此时记录下文件的偏移
     int offset = (int)output.tellp();
@@ -379,8 +380,8 @@ record_t  *Record::Select(info_t & select_info)
     for(i=0; i<curEnd; i+=select_info.t.recordLength)
     {
         //cout << "文件指针： " << i << endl;
-
-        if(Judge(condition, i, select_info.t, input) == 1)
+        int judgeResult = Judge(condition, i, select_info.t, input);
+        if( judgeResult == 1)
         {
             
             
@@ -438,22 +439,24 @@ record_t  *Record::Select(info_t & select_info)
                 }
                 valueMove->next = NULL;
                 
-
-
-
             }
 
-
-
-               
         }
+        else if (judgeResult == -1)
+        {
+            cout << "错误字段!" << endl;
+            return NULL;
+        }
+
+        else
+            continue;
     }
     input.close();
     return head->next;
 
 }
 
-/* 输出一条记录 */
+/* 输出所有符合条件的记录 */
 void Record::Print(record_t * record)
 {
     while (record != NULL)
