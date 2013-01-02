@@ -5,11 +5,13 @@
 int main()
 {
     API api;
-    printf("+-------------------------+\n");
-    printf("| Welcome to use MiniSQL. |\n");
-    printf("+-------------------------+\n");
+    cout << "+-------------------------+\n" ;
+    cout << "| Welcome to use MiniSQL. |\n";
+    cout << "+-------------------------+\n";
+    cout << flush;    
     while(1)
     {
+        cout << "MiniSQL>";
         if (api.getInput() < 0) {
             sql_error("Command format error");
             continue;
