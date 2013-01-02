@@ -1,9 +1,9 @@
 #include "helper.h"
 
 void sql_error(string msg) {
-    cout << endl <<  "ERROR: " << msg << endl; 
+    cout <<  "ERROR: " << msg << endl; 
 }
 
 void sql_msg(string msg) {
-    cout << endl << "MSG: " << msg << endl; 
+    cout << "MSG: " << msg << endl; 
 }

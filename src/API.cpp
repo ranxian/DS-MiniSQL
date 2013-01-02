@@ -24,12 +24,13 @@ int API::createTable() {
     string tableName = info.tableName;
 
     if (catalog_manager->tableExist(tableName)) {
+        sql_error("TABLE [" + tableName + "] has already exsited");
         return -1;
     } else {
         catalog_manager->createTable(info.t);
     }
 
-    sql_msg("TABLE " + tableName + " created");
+    sql_msg("TABLE [" + tableName + "] created");
     return 0;
 }
 
@@ -55,7 +56,7 @@ int API::select() {
     return 0;
 }
 
-// V
+// 插入多条同样信息了吗？
 int API::insert() {
     info_t info = interpreter->getInfo();
 
@@ -69,6 +70,7 @@ int API::dropTable() {
     info_t info = interpreter->getInfo();
 
     catalog_manager->deleteTable(info.t);
+    // TODO: record_manager->deleteTable(info.t)
 
     return 0;
 }
