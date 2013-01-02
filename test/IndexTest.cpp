@@ -117,17 +117,23 @@ int main()
     // 尝试搜索具有相同关键码的多个索引项
     index_node_t selRes;
     cout << "---搜索具有相同关键码的多个索引项：" << endl;
-    // IndexManager.debugPrint("Persons", "学号");
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     IndexManager.selectIndex("Persons", "学号", "1100099999", "1100099999", &selRes);
     printNode(&selRes);
-
     // 删除一条索引后再搜索
     IndexManager.deleteIndex("Persons", "学号", "1100099999");
     IndexManager.selectIndex("Persons", "学号", "1100012956", "1100099999", &selRes);
     printNode(&selRes);
     cout << endl;
 
+    // 更新索引项
+    // IndexManager.debugPrint("Persons", "学号");
+    cout << "---更新索引项：" << endl;
+    IndexManager.updateIndex("Persons", "学号", "1100099999", "1100199999");
+    cout << endl;
+    // IndexManager.debugPrint("Persons", "学号");
+
+    return 0;
 }

@@ -276,9 +276,9 @@ int Index::updateIndex(string tableName, string indexName, string value, string 
     // 更新要求索引项
     curIdxNode.value = newValue;
 
-    // 将更新了的索引项写回文件
-    fs.seekp(pos);
-    writeNode(fs, curIdxNode);
+    // 为了保持更新后有序 先删除该索引项 再将更新过的索引项插入到合适位置
+    deleteIndex(tableName, indexName, value);
+    insertIndex(tableName, indexName, curIdxNode);
 
     fs.close();
 
