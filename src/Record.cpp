@@ -382,14 +382,21 @@ void Record::Update(info_t & update_info, index_node_t & index)
         if( judgeResult == 1 )
         {
             output.seekp(i, ios::beg);
+            int curPos = i;
             //cout << "此时指针位置: " << i << endl;
             //string temp = "oop\0";
              //对所有字段都写入oop串
             for (int k=0; k<target.attrNum; k++)                      
             {
                 
+                
+                
                 map<string, string> ::iterator iter;
                 attr_t target = update_info.t.attributes[k];
+                if (k != 0)
+                {
+                    curPos += update_info.t.attributes[k - 1].length;
+                }
                 for (iter=update_info.updateItems.begin(); iter!=update_info.updateItems.end();
                     iter++)
                 {
@@ -403,7 +410,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
                         if (target.type == INT)
                         {
                             cout << "update int!" << endl;
-
+                            output.seekp(curPos, ios::beg);
                             int value = atoi(va);
                             cout <<"value= "<<value << endl;
                             output.write((char *)&value, 4);
@@ -411,8 +418,11 @@ void Record::Update(info_t & update_info, index_node_t & index)
                         //如果是char类型，就将string转换为char
                         else 
                         {
+                            
                             cout << "update string!" << endl;
+                            output.seekp(curPos, ios::beg);
                             output.write(va, target.length);
+                            cout <<"va=" << va << endl;
                         }
                         break;
                     }
@@ -421,12 +431,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
                 if (iter != update_info.insertItems.end())               
                     continue;
         
-                //如果某个字段不在map中，则输入空的字节数
-                else                                                     
-                {
-                    string hollow = "oop\0";
-                    output.write((char *)hollow.c_str(), target.length);
-                }
+
                
             }
         }
