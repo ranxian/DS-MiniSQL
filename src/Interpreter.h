@@ -7,13 +7,17 @@ using namespace std;
 class Interpreter
 {
 public:
-    // get command from STDIN
-    bool inputCommand();                                            
-    // get condition tree
-    void getCondition(std::vector<string> command, condition_tree_t * condition);  
-    // get the result after interpretation
+    /*
+     * get command from STDIN
+     */
+    bool inputCommand();                      
+    /*                      
+     * get the result after interpretation
+     */
     info_t getInfo();                         
-    // print information for debug               
+    /*
+     * print information for debug 
+     */             
     void debug();    
     // Constructor
     Interpreter(); 
@@ -22,7 +26,7 @@ public:
 
 private:
     /*--------------parse different types of commands------------------*/
-    bool parseCommand();                                            // parse the input
+    bool parseCommand();                                          
     bool parseInsert();
     bool parseSelect();
     bool parseCreate();
@@ -38,10 +42,13 @@ private:
     void showConditionTree(condition_tree_t * root);  
     // destruct the condition tree 
     void clearTree(condition_tree_t * root);
-    string input;                                                   // command input by user
-    std::vector<string> command;                                    // parsed command 
-    info_t info;                                                    // infomation interpreted by Interpreter
     // make condition tree with given input
     condition_tree_t * makeTree(int index);
+
+    /* private variables*/
+    string input;                                            // command input by user
+    std::vector<string> command;                             // parsed command 
+    info_t info;                                             // infomation interpreted by Interpreter
+
 };
 #endif

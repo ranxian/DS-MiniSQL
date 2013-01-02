@@ -13,7 +13,7 @@ int main()
     {
         cout << "MiniSQL> " << flush;
         if (api.getInput() < 0) {
-            sql_error("Command format error");
+            //sql_error("Command format error");
             continue;
         }
         switch (api.commandType()) {
