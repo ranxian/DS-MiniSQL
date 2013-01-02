@@ -133,7 +133,7 @@ struct index_node_t
 {
     string value;       // 关键码
     // void *basep;     // 内存中的基地址
-    unsigned offset;    // basep 的偏移
+    unsigned offset;    // 文件内的偏移
 
     index_node_t *nextNode;     // ！！强烈注意：该指针在写入文件的时候不会写入，在读出文件的时候不会读出
                                 //              其作用只是在 select 时，返回一个索引项的链表（因为有时
