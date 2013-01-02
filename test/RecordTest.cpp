@@ -13,6 +13,7 @@ int main()
     Record Test;
     info_t testInfo;
     record_t *testRecord;
+    index_node_t jy;
     while (itp.inputCommand())
     {
         testInfo = itp.getInfo();
@@ -28,6 +29,10 @@ int main()
         else if (testInfo.command == INSERT)
         {
             Test.Insert(testInfo);
+        }
+        else if (testInfo.command == DELETE)
+        {
+            Test.Delete(testInfo, jy);
         }
         else
         {
