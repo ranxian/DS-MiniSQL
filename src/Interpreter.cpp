@@ -303,6 +303,7 @@ bool Interpreter::parseSelect() //OK
     while (strcasecmp(command[i].c_str(),"where"))
     {
         info.selectedTable.push_back(command[i]);
+        info.tableName = command[i];
         i++;
         if (i == (int)command.size())
         {

@@ -15,9 +15,9 @@ public:
     info_t getInfo();                         
     // print information for debug               
     void debug();    
-
+    // Constructor
     Interpreter(); 
-
+    // Destructor
     ~Interpreter();                        
 
 private:
