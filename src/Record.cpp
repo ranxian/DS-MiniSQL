@@ -282,6 +282,7 @@ int Record::Insert(info_t & insert_info)
 /* 将所有的字段值都改为oop */
 void Record::Delete(info_t & delete_info, index_node_t & index)         
 {
+    index = index;
     string Filename;
     Filename = "../data/" + delete_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
@@ -355,7 +356,9 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
 /* 基本处理同insert */
 void Record::Update(info_t & update_info, index_node_t & index)
 {
-    
+    update_info = update_info;
+    index = index;
+    /*
     string Filename;
     Filename = "../data/" + update_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
@@ -497,6 +500,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
 
     }
     output.close();
+    */
     return;
 
     

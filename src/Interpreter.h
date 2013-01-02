@@ -45,7 +45,7 @@ private:
     // make condition tree with given input
     condition_tree_t * makeTree(int index);
 
-    /* private variables*/
+    /* private variables */
     string input;                                            // command input by user
     std::vector<string> command;                             // parsed command 
     info_t info;                                             // infomation interpreted by Interpreter

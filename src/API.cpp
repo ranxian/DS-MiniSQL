@@ -95,16 +95,15 @@ int API::deleteRecord() {
     info_t info = interpreter->getInfo();
     index_node_t res;
 
-    // 在这里的 Delete 中删除索引
     record_manager->Delete(info, res);
 
-    index_node_t *todel = getIndex(info.tableName, info.tree);
-    table_t table = catalog_manager->findTable(info.tableName);
+    // index_node_t *todel = getIndex(info.tableName, info.tree);
+    // table_t table = catalog_manager->findTable(info.tableName);
 
-    while (todel) {
-        for (int i = 0; i < table.attrNum; i++)
-            index_manager->deleteIndex(info.tableName, table.attributes[i].name, todel->value);
-    }
+    // while (todel) {
+    //     for (int i = 0; i < table.attrNum; i++)
+    //         index_manager->deleteIndex(info.tableName, table.attributes[i].name, todel->value);
+    // }
 
     return -1;
 }
