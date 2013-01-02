@@ -211,7 +211,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
         else 
             return -1;
     }
-    
+    return -1;
 }
 
 /* Insert函数返回最后一条记录相对文件头的偏移量 */

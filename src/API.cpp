@@ -24,13 +24,13 @@ int API::createTable() {
     string tableName = info.tableName;
 
     if (catalog_manager->tableExist(tableName)) {
-        sql_error("TABLE [" + tableName + "] has already exsited");
+        sql_error("TABLE \"" + tableName + "\" has already exsited");
         return -1;
     } else {
         catalog_manager->createTable(info.t);
     }
 
-    sql_msg("TABLE [" + tableName + "] created");
+    sql_msg("TABLE \"" + tableName + "\" created");
     return 0;
 }
 
@@ -39,12 +39,11 @@ int API::createIndex() {
 
     string tableName = info.tableName;
     string indexName = info.indexName;
-    /* TODO */
+
     return 0;
 }
 
 // V
-// 打印多条记录
 int API::select() {
     info_t info = interpreter->getInfo();
     table_t table = info.t;
@@ -52,11 +51,11 @@ int API::select() {
     record_t *records = record_manager->Select(info);
 
     record_manager->PrintHead(table);
+    
     record_manager->Print(records);
     return 0;
 }
 
-// 插入多条同样信息了吗？
 int API::insert() {
     info_t info = interpreter->getInfo();
 
