@@ -1,6 +1,6 @@
 #include "Index.h"
 
-void Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
+int Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
 {
     fstream fin;
 
@@ -16,33 +16,43 @@ void Index::selectIndex(string tableName, string indexName, string valueFrom, st
     // 二分查找到要求索引的起始、结束地址
     int from;
     int to;
-    // 如果查找范围最小值不比第一个索引值大，那么从第一个索引开始收集
-    index_node_t firstNode;
-    fin.seekg(IDXHEAD_SIZE_IN_FILE);
-    readNode(fin, firstNode);
-    if (!lessThan(firstNode.value, valueFrom, idxHd.attr.type))
+    // 如果是要取出所有索引的话
+    if (valueFrom == "ZHAODIAO" && valueTo == "ZHAODIAO")
     {
         from = IDXHEAD_SIZE_IN_FILE;
-    }
-    // 否则，进行二分查找
-    else
-    {
-        fin.seekg(IDXHEAD_SIZE_IN_FILE);
-        from = biSearchFrom(fin, 1, idxHd.recNum, valueFrom, idxHd.attr.type);
-    }
-    // 如果查找范围最大值不比最后一个索引值小，那么收集到最后一个索引
-    index_node_t lastNode;
-    fin.seekg(IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE);
-    readNode(fin, lastNode);
-    if (!lessThan(valueTo, lastNode.value, idxHd.attr.type))
-    {
         to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
     }
-    // 否则，进行二分查找
+    // 否则
     else
     {
+        // 如果查找范围最小值不比第一个索引值大，那么从第一个索引开始收集
+        index_node_t firstNode;
         fin.seekg(IDXHEAD_SIZE_IN_FILE);
-        to = biSearchTo(fin, 1, idxHd.recNum, valueTo, idxHd.attr.type);
+        readNode(fin, firstNode);
+        if (!lessThan(firstNode.value, valueFrom, idxHd.attr.type))
+        {
+            from = IDXHEAD_SIZE_IN_FILE;
+        }
+        // 否则，进行二分查找
+        else
+        {
+            fin.seekg(IDXHEAD_SIZE_IN_FILE);
+            from = biSearchFrom(fin, 1, idxHd.recNum, valueFrom, idxHd.attr.type);
+        }
+        // 如果查找范围最大值不比最后一个索引值小，那么收集到最后一个索引
+        index_node_t lastNode;
+        fin.seekg(IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE);
+        readNode(fin, lastNode);
+        if (!lessThan(valueTo, lastNode.value, idxHd.attr.type))
+        {
+            to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
+        }
+        // 否则，进行二分查找
+        else
+        {
+            fin.seekg(IDXHEAD_SIZE_IN_FILE);
+            to = biSearchTo(fin, 1, idxHd.recNum, valueTo, idxHd.attr.type);
+        }
     }
 
     // cout << "--------------from: " << from << " to: " << to << endl;
@@ -71,9 +81,12 @@ void Index::selectIndex(string tableName, string indexName, string valueFrom, st
     }
 
     fin.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::createIndex(string tableName, string indexName, attr_t & attr)
+int Index::createIndex(string tableName, string indexName, attr_t & attr)
 {
     fstream fout;
 
@@ -88,9 +101,12 @@ void Index::createIndex(string tableName, string indexName, attr_t & attr)
     writeHead(fout, idxHd);
 
     fout.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::insertIndex(string tableName, string indexName, index_node_t & node)
+int Index::insertIndex(string tableName, string indexName, index_node_t & node)
 {
     fstream fs;
 
@@ -175,9 +191,12 @@ void Index::insertIndex(string tableName, string indexName, index_node_t & node)
     }
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::deleteIndex(string tableName, string indexName, string value)
+int Index::deleteIndex(string tableName, string indexName, string value)
 {
     fstream fs;
 
@@ -229,9 +248,12 @@ void Index::deleteIndex(string tableName, string indexName, string value)
     delete [] idxNode;
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::updateIndex(string tableName, string indexName, string value, string newValue)
+int Index::updateIndex(string tableName, string indexName, string value, string newValue)
 {
     fstream fs;
 
@@ -259,9 +281,12 @@ void Index::updateIndex(string tableName, string indexName, string value, string
     writeNode(fs, curIdxNode);
 
     fs.close();
+
+    // 成功返回 0
+    return 0;
 }
 
-void Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
+int Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;
@@ -318,6 +343,9 @@ void Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
     // 删除多余的一个节点
     delete lastRes->nextNode;
     lastRes->nextNode = NULL;
+
+    // 成功返回 0
+    return 0;
 }
 
 /***********************************************************/
@@ -383,7 +411,10 @@ int Index::biSearchFrom(fstream & fin, int from, int to, string value, attrtype_
     else if (lessThan(value, curValue, type))
     {
         return biSearchFrom(fin, from, mid - 1, value, type);
-    } else {
+    } 
+    // 表现正常是不会到这儿的
+    else 
+    {
         return -1;
     }
 }
@@ -426,7 +457,10 @@ int Index::biSearchTo(fstream & fin, int from, int to, string value, attrtype_t 
     else if (lessThan(value, curValue, type))
     {
         return biSearchTo(fin, from, mid - 1, value, type);
-    } else {
+    } 
+    // 表现正常是不会到这儿的
+    else 
+    {
         return -1;
     }
 }

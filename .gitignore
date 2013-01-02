@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+*.out
+minisql
+
+# Data files
+*.rec
+*.list
+*.idx

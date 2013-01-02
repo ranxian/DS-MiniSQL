@@ -2,6 +2,11 @@
 # include <string.h>
 
 
+Interpreter::Interpreter()
+{
+    info.tree = NULL;
+    info.tableName = "";
+}
 
 bool Interpreter::inputCommand()
 {
@@ -11,20 +16,40 @@ bool Interpreter::inputCommand()
 }
 
 bool Interpreter::parseCommand()
-{
+{ 
     int i, count = 0;
     clearInfo();
     size_t start, index, cutIndex;
     string seperators=" , \n";
-    string cut = "()<>";
+    string cut = "()<>=";
     string temp;
 
     start = input.find_first_not_of(seperators);
 
-    // cut into pieces
+
+
+    /*
+     * CUT the input into pieces for interprete
+     * deal with ()<> carefully
+     */
     while (start != string::npos)
     {
-        index = input.find_first_of(seperators,start);
+        if (input[start] == '(')
+        {
+            command.push_back("(");
+            start = input.find_first_not_of(seperators,start+1);
+        }
+        if (input[start] == '\'')
+        {
+            index = input.find("'", start+1)+1;
+        }
+        else if (input[start] == '"')
+        {
+            index = input.find("\"", start+1)+1;
+        }
+        else
+            index = input.find_first_of(seperators,start);
+
         if (index == string::npos)
         {
             temp = (input.substr(start,index-start));
@@ -58,13 +83,10 @@ bool Interpreter::parseCommand()
             start = input.find_first_not_of(seperators,index+1);
         }
     }
-    /* for debug
-    for (i = 0; i < command.size(); i++)
-    {
-        printf("%s %d\n", command[i].c_str(),command[i].length());
-    }
-    */
-    
+
+    /*
+     * basic error checking of brackets
+     */
     for (i = 0; i < (int)command.size(); i++)
     {
         if (command[i] == "(")
@@ -83,7 +105,9 @@ bool Interpreter::parseCommand()
         return false;
     }
 
-   // printf("%s\n",command[0].c_str() );
+   /* 
+    * parse different kinds of command
+    */
     if (!strcasecmp(command[0].c_str(), "create"))
         return parseCreate();
     else if (!strcasecmp(command[0].c_str(), "select"))
@@ -97,16 +121,26 @@ bool Interpreter::parseCommand()
     else if (!strcasecmp(command[0].c_str(), "update"))
         return parseUpdate();
     else if (!strcasecmp(command[0].c_str(), "quit"))
-        return parseQuit();
+    {
+        exit(0);
+    }
     else if (!strcasecmp(command[0].c_str(), "help"))
         return parseHelp();
+    else if (command[0] == "#")
+        return false;
     else
     {
+        /*
+         * No such type of command
+         */
         printf("Command '%s' invalid. Please check again.\n",command[0].c_str());
         return false;
     }
 }
 
+/*
+ * get the infomation interpreted by interpreter
+ */
 info_t Interpreter::getInfo()
 {
     return info;
@@ -118,22 +152,30 @@ bool Interpreter::parseCreate() // OK
     int i = 4;
     int length = 0;
     info.command = CREATE_TABLE;
+    /*
+     * Input not enough
+     */
     if (command.size() < 7)
     {
-        printf("Syntax error in create command.\n");
+        printf("Syntax error in create command. Need more input.\n");
         return false;
     }
     info.tableName = command[2];
     info.t.name = command[2];
     while (command[i] != ")")
     {
+        /*
+         * Error handling
+         */
         if (i == (int)command.size())
         {
             printf("Syntax error in Create cmmand. (Forget the ')' ?)\n");
             return false;
         }
+        // Get attribute name
         info.t.attributes[count].name = command[i];
         i++;
+        // Get attribute type
         if (!strcasecmp(command[i].c_str(),"int"))
         {
             info.t.attributes[count].type = INT;
@@ -150,6 +192,10 @@ bool Interpreter::parseCreate() // OK
         }
         else
         {
+            /*
+             * Error handling
+             * No such type
+             */
             printf("The type '%s' is not supported. Please check again.\n",command[i].c_str() );
             info.command = NONE;
             return false;
@@ -194,6 +240,9 @@ bool Interpreter::parseQuit()   //OK
 bool Interpreter::parseDrop()   //OK
 {
     info.command = DROP_TABLE;
+    /*
+     * Error handing
+     */
     if (command.size() != 3)
     {
         printf("Syntax error in drop command. Please check again\n");
@@ -206,20 +255,37 @@ bool Interpreter::parseDrop()   //OK
 bool Interpreter::parseSelect() //OK
 {
     info.command = SELECT;
+    /*
+     * Error handling
+     * Input not enough
+     */
+    if (command.size() == 1)
+    {
+        printf("'select' command need more input.\n");
+        return false;
+    }
     int i = 1;
     while (strcasecmp(command[i].c_str(),"from"))
     {
         info.selectedItems.push_back(command[i]);
         i++; 
+        /*
+         * Error handling
+         * No table specified
+         */
         if (i == (int)command.size())
         {
             printf("Systax error: No talbe specified\n");
             return false;
         }   
     }
+    /*
+     * Error handling
+     * No columns/table specified
+     */
     if (i == 1)
     {
-        printf("No columns selected. Please check again\n");
+        printf("No columns selected. Please check again.\n");
         return false;
     }
     i++;
@@ -244,6 +310,9 @@ bool Interpreter::parseSelect() //OK
         info.tree = makeTree(i+1);
         if (info.tree == NULL)
         {
+            /* 
+             *Error occurs when parsing the condition expression
+             */
             return false;
         }
     }
@@ -297,6 +366,11 @@ bool Interpreter::parseInsert()  //OK
     info.tableName = command[2];
     int index1 ,index2;
     index1 = index2 = 4;
+    /*
+     * bound checking needed here
+     * not added yet
+     *
+     */
     while (command[index2] != "(")
     {
         index2++;
@@ -332,7 +406,7 @@ bool Interpreter::parseUpdate() //OK
         return false;
     }
     info.tableName = command[1];
-    if (command.size() <= 6 )
+    if (command.size() < 6 )
     {
         printf("Systax error. Update command needs more input\n");
         return false;
@@ -380,7 +454,7 @@ condition_tree_t * Interpreter::makeTree(int index)
         {
             ptr->leftOperand = command[i];
             i++;
-            if (command[i] == "==")
+            if (command[i] == "=")
                 ptr->opName = EQ;
             else if (command[i] == "<>")
                 ptr->opName = NE;
@@ -392,6 +466,11 @@ condition_tree_t * Interpreter::makeTree(int index)
                 ptr->opName = GTE;
             else if (command[i] == "<=")
                 ptr->opName = LTE;
+            else
+            {
+                printf("Syntax error in condition expression.\n" );
+                return NULL;
+            }
             i++;
             if (i == (int)command.size())
             {

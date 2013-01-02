@@ -15,17 +15,17 @@ class Index
 {
 public:
     // 查找关键码为 value 的索引项
-    void selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res);
+    int selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res);
     // 建立索引
-    void createIndex(string tableName, string indexName, attr_t & attr);                           
+    int createIndex(string tableName, string indexName, attr_t & attr);                           
     // 插入关键码为 value 的新索引项
-    void insertIndex(string tableName, string indexName, index_node_t & node);
+    int insertIndex(string tableName, string indexName, index_node_t & node);
     // 删除关键码为 value 的索引项
-    void deleteIndex(string tableName, string indexName, string value);                           
+    int deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
-    void updateIndex(string tableName, string indexName, string value, string newValue);
+    int updateIndex(string tableName, string indexName, string value, string newValue);
     // 合并多个索引项链表，结果放在 res 中
-    void mergeIndex(index_node_t **list, int listNum, index_node_t *res);          
+    int mergeIndex(index_node_t **list, int listNum, index_node_t *res);          
     Index();
     ~Index();
 private:
