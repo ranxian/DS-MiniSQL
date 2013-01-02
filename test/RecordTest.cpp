@@ -23,15 +23,7 @@ int main()
         else if (testInfo.command == SELECT)
         {
             testRecord = Test.Select(testInfo);
-            //cout << "record selected successfully!" << endl;
-            if (testRecord != NULL)
-            {
-                Test.Print(testRecord);
-            }
-            else
-            {
-                cout << "record not found!!" << endl;
-            }
+            Test.Print(testRecord);
         }
         else if (testInfo.command == INSERT)
         {
