@@ -1,3 +1,40 @@
+To TA:
+    You can test like this.
+
+(Integrate Test:)
+
+create table Person
+(
+id int,
+name char,
+sex char,
+school char,
+);
+
+insert into Person (id, name, sex, school) values (124, qq, man, PKU);
+
+insert into Person (id, name) values ( 123, 'zz' );
+
+select * from Person ;
+
+select * from Person where name = qq ;
+
+Select id, name from Person where school = PKU;
+
+delete from Person where name = 'zz';
+
+select * from Person ;
+
+update Person set name = haha where school = PKU ;
+
+select * from Person ;
+
+delete from Person ;
+
+select * from Person ;
+
+------------------------------------------------------------------------------------
+
 Create:
     create table address ( city char, street_no int );
     create table address ( id int primary key, city char, street_no int );
@@ -26,22 +63,5 @@ Drop:
 
 Quit:
 
-Integrate:
 
-create table address ( city char, street_no int );
-insert into address ( city, street_no ) values ( 'New York', 5 );
-insert into address ( city, street_no ) values ( 'New York', 10 );
 
-select city from address where city = 'New York';
-Select city, street_no from address where street_no = 5;
-select city from address where city = 'New York' and street_no = 5;
-
-select * from address;
-select city from address where street_no <= 4;
-
-// 下面这三条有问题
-update address set street_no = 2 where city = 'New York';
-delete from address where street_no = 5;
-delete from address;
-
-drop table address;

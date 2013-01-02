@@ -24,7 +24,7 @@ int main()
         else if (testInfo.command == SELECT)
         {
             testRecord = Test.Select(testInfo);
-            Test.Print(testRecord);
+            Test.Print(testRecord, testInfo);
         }
         else if (testInfo.command == INSERT)
         {

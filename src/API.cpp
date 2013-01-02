@@ -61,7 +61,7 @@ int API::select() {
     if (records != NULL)
         record_manager->PrintHead(table);
 
-    record_manager->Print(records);
+    record_manager->Print(records, info);
     return 0;
 }
 
