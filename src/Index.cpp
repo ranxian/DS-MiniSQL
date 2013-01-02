@@ -286,7 +286,110 @@ int Index::updateIndex(string tableName, string indexName, string value, string 
     return 0;
 }
 
-int Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
+int Index::mergeIndexAND(index_node_t **list, int listNum, index_node_t *res)
+{
+    index_node_t *curRes = res;
+    int resNum = 0;
+    index_node_t *lastRes;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
+    curRes->nextNode = NULL;
+
+    for (int i = 0; i < listNum; i++)
+    {
+        index_node_t *curNode = list[i];
+        // 将 list[i] 中的节点加入结果列表
+        while (true)
+        {
+            // 查找其他列表中是否都存在和 curNode 一样的节点
+            bool curValid = true;   // 是否要将 curNode 添加到 res 中
+            for (int j = 0; j < listNum; j++)
+            {
+                index_node_t *cmpNode = list[j];
+                // 查看列表 list[j] 中是否存在和 curNode 一样的节点
+                bool exist = false;
+                while (true)
+                {
+                    if (cmpNode->offset == curNode->offset)
+                    {
+                        exist = true;
+                        break;
+                    }
+                    // 若没有下一个节点 退出当前列表 合并下一个列表
+                    if (curNode->nextNode == NULL)
+                    {
+                        break;
+                    }
+                    // 若有下一个节点 继续合并当前列表
+                    else
+                    {
+                        curNode = curNode->nextNode;
+                    }
+                }
+                // 如果 list[j] 中没有和 curNode 一样的节点，可以判定 curNode 是无须加入的
+                if (!exist)
+                {
+                    curValid = false;
+                    break;
+                }
+                // 如果 list[j] 中有和 curNode 一样的节点，继续查看下一个列表
+                else
+                {
+                    continue;
+                }
+            }
+
+            // 如果 curNode 须加入 res 的，加入之
+            if (curValid)
+            {
+                // 查找结果列表中是否已存在当前节点
+                bool exist = false;
+                if (resNum > 0)
+                {
+                    index_node_t *tmp = res;
+                    for (int i = 0; i < resNum; i++)
+                    {
+                        if (tmp->value == curNode->value)
+                        {
+                            exist = true;
+                            break;
+                        }
+                        tmp = tmp->nextNode;
+                    }
+                }
+                // 如果结果列表中不存在当前节点 才把当前节点加入结果列表
+                if (!exist)
+                {
+                    curRes->value = curNode->value;
+                    curRes->offset = curNode->offset;
+                    resNum++;
+                    // 在这里会导致最后多申请一个节点，需要删除之
+                    curRes->nextNode = new index_node_t; 
+                    lastRes = curRes;
+                    curRes = curRes->nextNode;
+                }
+            }
+
+            // 若没有下一个节点 退出当前列表 合并下一个列表
+            if (curNode->nextNode == NULL)
+            {
+                break;
+            }
+            // 若有下一个节点 继续合并当前列表
+            else
+            {
+                curNode = curNode->nextNode;
+            }
+        }
+    }
+
+    // 删除多余的一个节点
+    delete lastRes->nextNode;
+    lastRes->nextNode = NULL;
+
+    // 成功返回 0
+    return 0;
+}
+
+int Index::mergeIndexOR(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;

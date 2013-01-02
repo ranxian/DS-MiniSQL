@@ -24,8 +24,10 @@ public:
     int deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
     int updateIndex(string tableName, string indexName, string value, string newValue);
-    // 合并多个索引项链表，结果放在 res 中
-    int mergeIndex(index_node_t **list, int listNum, index_node_t *res);          
+    // 取多个索引项链表的交集（要求这些索引属于同一个表），结果放在 res 中
+    int mergeIndexAND(index_node_t **list, int listNum, index_node_t *res);        
+    // 取多个索引项链表的并集，结果放在 res 中
+    int mergeIndexOR(index_node_t **list, int listNum, index_node_t *res);    
     Index();
     ~Index();
 private:
