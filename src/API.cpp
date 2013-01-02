@@ -58,7 +58,8 @@ int API::select() {
 
     record_t *records = record_manager->Select(info);
 
-    record_manager->PrintHead(table);
+    if (records != NULL)
+        record_manager->PrintHead(table);
 
     record_manager->Print(records);
     return 0;
@@ -131,6 +132,7 @@ cmd_t API::commandType() {
 index_node_t* API::getIndex(string tableName, condition_tree_t *node) {
     index_node_t *res = new index_node_t;
     index_node_t **temp = new index_node_t*[2];
+
     if (node->end) {
         index_manager->selectIndex(tableName, node, res);
     } else {
