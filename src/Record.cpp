@@ -18,14 +18,6 @@ int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLengt
     int i;
     Offset = 0;
     attriLength = 0;
-    //cout << "attrnum= " << table.attrNum << endl;
-    /*
-    for (i=0; i<table.attrNum; i++)
-    {
-        cout << "attributes " <<i<<".length= " << table.attributes[i].length<<endl;
-    }
-    */
-
     for (i=0; i<table.attrNum; i++)
     {
         if (i != 0)
@@ -377,8 +369,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
      for(i=0; i<curEnd; i+=update_info.t.recordLength)
     {
         //cout << "文件指针： " << i << endl;
-        if (update_info.tree != NULL)
-        {
+        
             output.close();
             ifstream input;
             input.open(filename, ios::binary|ios::in);
@@ -386,18 +377,10 @@ void Record::Update(info_t & update_info, index_node_t & index)
             input.close();
             output.open(filename, ios::binary|ios::out|ios::in);
 
-        }
         
-        if( judgeResult == 1 || update_info.tree == NULL)
+        
+        if( judgeResult == 1 )
         {
-            if (judgeResult == 1)
-            {
-                //cout << "judgeResult = 1" << endl;
-            }
-            if (update_info.tree == NULL)
-            {
-                //cout << "tree = NULL" << endl;
-            }
             output.seekp(i, ios::beg);
             //cout << "此时指针位置: " << i << endl;
             //string temp = "oop\0";
@@ -413,17 +396,22 @@ void Record::Update(info_t & update_info, index_node_t & index)
                     //如果某个字段在map中存在
                     if (target.name == iter->first)                      
                     {
+                        cout << "attriname " << target.name << " was found!" << endl;
                          //字段的值本为string类型，先转换为char类型
                         char *va = (char *)iter->second.c_str();
                         //如果是int类型，就将string类型转换为int型，但必须保持数据大小为4字节
                         if (target.type == INT)
                         {
+                            cout << "update int!" << endl;
+
                             int value = atoi(va);
+                            cout <<"value= "<<value << endl;
                             output.write((char *)&value, 4);
                         }
                         //如果是char类型，就将string转换为char
                         else 
                         {
+                            cout << "update string!" << endl;
                             output.write(va, target.length);
                         }
                         break;
@@ -461,10 +449,12 @@ void Record::Update(info_t & update_info, index_node_t & index)
 
 record_t  *Record::Select(info_t & select_info)
 {
+    /*
     if (select_info.tree == NULL)
     {
         cout << "this is a * command! " << endl;
     }
+    */
     //先打开对应的文件
     string Filename;
     //cout << "select_info.tableName=" << select_info.selectedTable[0] << endl;
