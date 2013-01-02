@@ -10,15 +10,68 @@ int main()
     
 
     Interpreter itp;
+    Record Test;
     info_t testInfo;
+    record_t *testRecord;
+    
+    //建表，输出表字段信息
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+    //Test.Insert(testInfo);
+        Test.PrintHead(testInfo.t);
+        cout << "table built successfully!" << endl;
+    }
+    
+
+    //插入记录
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        cout << "record inserted successfully!"  << endl;
+    }
+    
+    //Test.Print(testRecord);
+    /*
+    //插入记录
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        cout << "record inserted successfully!"  << endl;
+    }
+    */
+
+    //查找记录并输出
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        //itp.debug(); 
+        testRecord = Test.Select(testInfo);
+        cout << "record selected successfully!" << endl;
+        Test.Print(testRecord);
+        
+
+    }
+    
+
+
+    /*
     while(1)
     {
         if (itp.inputCommand())
         {
-            testInfo = itp.getInfo();
+            
+            testRecord = Test.select(testInfo)
+
         }
+
          
     }
+    
+
+    */
 
 
     /*
