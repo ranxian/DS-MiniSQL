@@ -1,12 +1,27 @@
 #include "../src/MiniSQL.h"
 #include "../src/Record.h"
+#include "../src/Record.cpp"
+#include "../src/Interpreter.cpp"
+#include "../src/Interpreter.h"
 
 
 int main()
 {
-    Record testRecord;
     
-    table_t table;
+
+    Interpreter itp;
+    info_t testInfo;
+    while(1)
+    {
+        if (itp.inputCommand())
+        {
+            testInfo = itp.getInfo();
+        }
+         
+    }
+
+
+    /*
     table.name = "Persons";
     table.attrNum = 3;
     table.recordLength = 68;
@@ -23,7 +38,26 @@ int main()
     table.attributes[2].length = 8;
     table.attributes[2].type = INT;
 
+    Record testRecord;
+    
+    table_t table;
+    info_t info;
+    
+    
+    record_t * record = new record_t;
+    record->next = NULL;
+    record->value = NULL;
+    record->value = new value_t;
+    record->value->type = CHAR;
+    record->value->str_value = "hehehaha";
+    record->value->next = new value_t;
+    record->value->next->type = INT;
+    record->value->next->int_value = 12;
+    record->value->next->next = NULL;
+
     testRecord.PrintHead(table);
+    testRecord.Print(record);
+    */
     /*
     // 初始化表
     CatalogManager.initTable();

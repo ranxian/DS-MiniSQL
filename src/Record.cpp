@@ -182,7 +182,7 @@ int Record::Insert(info_t & insert_info)
     
     /* 根据表明生成文件名 */
     string Filename;
-    Filename = "\"" + insert_info.tableName + ".rec\"";
+    Filename = "../data/" + insert_info.tableName + ".rec";
 
     //filename即为表名处理过的字符串
     char *filename = (char *)Filename.c_str();                  
@@ -242,7 +242,7 @@ int Record::Insert(info_t & insert_info)
 void Record::Delete(info_t & delete_info, index_node_t & index)         
 {
     string Filename;
-    Filename = "\"" + delete_info.tableName + ".rec\"";
+    Filename = "../data/" + delete_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
     ofstream output;
     output.open(filename, ios::binary|ios::app|ios::out);
@@ -263,7 +263,7 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
 void Record::Update(info_t & update_info, index_node_t & index)
 {
     string Filename;
-    Filename = "\"" + update_info.tableName + ".rec\"";
+    Filename = "../data/" + update_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
     ofstream output;
     output.open(filename, ios::binary|ios::app|ios::out);
@@ -306,7 +306,7 @@ record_t  *Record::Select(info_t & select_info)
 {
     //先打开对应的文件
     string Filename;
-    Filename = "\"" + select_info.tableName + ".rec\"";
+    Filename = "../data/" + select_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
     ifstream input;
     input.open(filename, ios::binary|ios::app|ios::in);
@@ -321,8 +321,6 @@ record_t  *Record::Select(info_t & select_info)
     record_t *move = head;
     //如果出现一个符合要求的记录，就包装成一个结构体record_t,并使move->next指向它
     //然后移动move，即move = move->next
-
-
 
     //condition指针指向整个条件树的根节点
     condition_tree_t *condition = select_info.tree;
