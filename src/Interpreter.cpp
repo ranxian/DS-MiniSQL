@@ -60,7 +60,7 @@ bool Interpreter::parseCommand()
             temp = (input.substr(start,index-start));
             while ((cutIndex = temp.find_first_of(cut)) != string::npos)
             {
-                if (temp == "<>")
+                if (temp == "<>" || temp == "<=" || temp == ">=")
                     break;
                 if (cutIndex != 0)
                     command.push_back(temp.substr(0,cutIndex));
@@ -76,7 +76,7 @@ bool Interpreter::parseCommand()
             temp = (input.substr(start,index-start));
             while ((cutIndex = temp.find_first_of(cut)) != string::npos)
             {
-                if (temp == "<>")
+                if (temp == "<>" || temp == "<=" || temp == ">=")
                     break;
                 if (cutIndex != 0)
                     command.push_back(temp.substr(0,cutIndex));
@@ -479,7 +479,7 @@ condition_tree_t * Interpreter::makeTree(int index)
             }
             i++;
             if (i == (int)command.size())
-            {
+            { 
                 printf("Syntax error in condition expression.\n");
                 return NULL;
             }
