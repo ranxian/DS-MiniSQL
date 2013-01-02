@@ -10,7 +10,7 @@ Select:
     select name from address where city = 'New York' and steet_no = 5;
 
 Insert:
-    insert into address (city, street_no) values ('New Yor, 5);
+    insert into address (city, street_no) values ('New York', 5);
 
 Update:
     update address set street_no = 1;
