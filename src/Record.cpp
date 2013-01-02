@@ -348,6 +348,10 @@ void Record::Update(info_t & update_info, index_node_t & index)
 
 record_t  *Record::Select(info_t & select_info)
 {
+    if (select_info.tree == NULL)
+    {
+        cout << "this is a * command! " << endl;
+    }
     //先打开对应的文件
     string Filename;
     //cout << "select_info.tableName=" << select_info.selectedTable[0] << endl;
@@ -377,11 +381,17 @@ record_t  *Record::Select(info_t & select_info)
     condition_tree_t *condition = select_info.tree;
     int i,j;
     //i表示每一条记录的首地址偏移
+    int judgeResult = 0;
     for(i=0; i<curEnd; i+=select_info.t.recordLength)
     {
         //cout << "文件指针： " << i << endl;
-        int judgeResult = Judge(condition, i, select_info.t, input);
-        if( judgeResult == 1)
+        if (select_info.tree != NULL)
+        {
+            judgeResult = Judge(condition, i, select_info.t, input);
+
+        }
+        
+        if( judgeResult == 1 || select_info.tree == NULL)
         {
             
             
@@ -450,6 +460,11 @@ record_t  *Record::Select(info_t & select_info)
 
         else
             continue;
+    }
+
+    if (head->next == NULL)
+    {
+        cout << "record not found!!" << endl;
     }
     input.close();
     return head->next;
