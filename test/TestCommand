@@ -6,11 +6,11 @@ Select:
     select * from address;
     select city, street_no from address;
     Select city, street_no from address where street_no = 5;
-    select name from address where city = New;
-    select name from address where city = New and steet_no = 5;
+    select name from address where city = 'New York';
+    select name from address where city = 'New York' and steet_no = 5;
 
 Insert:
-    insert into address (city, street_no) values ('New York', 5);
+    insert into address (city, street_no) values ('New Yor, 5);
 
 Update:
     update address set street_no = 1;
