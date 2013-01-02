@@ -1,0 +1,26 @@
+Create:
+    create table address(city char, street_no int);
+    create table address(id int primary key, city char, street_no int );
+
+Select:
+    select * from address;
+    select city, street_no from address;
+    Select city, street_no from address where street_no = 5;
+    select name from address where age = 20 and id > 100;
+
+Insert:
+    insert into address (city, street_no) values ('New York', 5);
+
+Update:
+    update address set street_no = 1;
+    update address set street_no = 2 where city = 'New York';
+
+Delete:
+    delete from address;
+    delete from address where street_no < 5;
+
+Drop:
+    drop table address;
+
+
+Quit:
