@@ -433,7 +433,7 @@ record_t  *Record::Select(info_t & select_info)
                     input.seekg(curPos, ios::beg);
                     int outIntinSel = 0;
                     input.read((char *)(&outIntinSel), select_info.t.attributes[j].length);
-                    cout << outIntinSel << endl;
+                    //cout << outIntinSel << endl;
                     valueMove->int_value = outIntinSel;
                 }
                 valueMove->next = NULL;
