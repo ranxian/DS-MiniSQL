@@ -1,6 +1,6 @@
 #include "API.h"
 #include "helper.h"
-
+using namespace std;
 API::API() 
 {
     interpreter = new Interpreter;
@@ -67,8 +67,15 @@ int API::select() {
 
 int API::insert() {
     info_t info = interpreter->getInfo();
+    index_node_t node; 
+    node.offset = record_manager->Insert(info);
 
-    record_manager->Insert(info);
+    for (map<string, string>::iterator iter = info.insertItems.begin();
+        iter != info.insertItems.end(); iter++) {
+
+        node.value = iter->second;
+        index_manager->insertIndex(info.tableName, iter->first, node);    
+    }
 
     return 0;
 }
@@ -87,15 +94,17 @@ int API::dropTable() {
 int API::deleteRecord() {
     info_t info = interpreter->getInfo();
     index_node_t res;
-    // string indexName = catalog_manager->getPrimaryAttr(info.tableName).name;
-    // index_manager->selectIndex(
-    //     info.tableName, 
-    //     indexName,
-    //     "ZHAODIAO",
-    //     "ZHAODIAO",
-    //     res
-    // );
+
+    // 在这里的 Delete 中删除索引
     record_manager->Delete(info, res);
+
+    index_node_t *todel = getIndex(info.tableName, info.tree);
+    table_t table = catalog_manager->findTable(info.tableName);
+
+    while (todel) {
+        for (int i = 0; i < table.attrNum; i++)
+            index_manager->deleteIndex(info.tableName, table.attributes[i].name, todel->value);
+    }
 
     return -1;
 }

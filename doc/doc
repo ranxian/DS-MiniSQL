@@ -14,9 +14,9 @@ struct table_head_t
 /* 字段结构 */
 struct attr_t {
   string name;        // 字段名
-  bool isPrimary;    // 是否主键
-  int length;        // 字段占字节数
-  attrtype_t type;   // 类型（CHAR, INT）
+  bool isPrimary;     // 是否主键
+  int length;         // 字段占字节数
+  attrtype_t type;    // 类型（CHAR, INT）
 };
 
 /* 表的结构 */
@@ -24,7 +24,7 @@ struct table_t
 {
   string name;          // 表名
   int attrNum;          // 字段数
-  int recordLength;    // 一条记录的字节数
+  int recordLength;     // 一条记录的字节数
   attr_t attributes[MAX_ATTR_NUM];    //字段
 };
 
@@ -233,7 +233,7 @@ info_t info;                       // infomation interpreted by Interpreter
 实现简单查错功能：
   1.括号是否匹配
   2.键入命令类型是否正确 (creat table t ..)
-3.键入命令类型是否正确键入变量类型是否支持 (id double)
+  3.键入命令类型是否正确键入变量类型是否支持 (id double)
   4.各命令是否缺少必è<SNR>64_SuperTab('n')
   ¦参数 （如 select from t; ）
 
