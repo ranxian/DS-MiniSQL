@@ -7,7 +7,6 @@
 
 #include "MiniSQL.h"
 
-
 class Record
 {
 public:

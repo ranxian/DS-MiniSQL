@@ -1,8 +1,4 @@
-# include "Interpreter.h"
-# include <string.h>
-# include <iostream>
-using namespace std;
-
+#include "Interpreter.h"
 
 Interpreter::Interpreter()
 {
