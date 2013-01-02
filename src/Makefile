@@ -7,7 +7,7 @@
 CXX = g++
 CPPFLAGS = -Wextra -Werror -Wall -O2
 
-OBJS = minisql.o api.o catalog.o index.o interpreter.o record.o
+OBJS = minisql.o api.o catalog.o index.o interpreter.o record.o helper.o
 
 minisql: $(OBJS)
 	$(CXX) $(CPPFLAGS) -o minisql $(OBJS)
@@ -24,6 +24,8 @@ interpreter.o: Interpreter.cpp Interpreter.h
 	$(CXX) $(CPPFLAGS) -c Interpreter.cpp
 record.o: Record.cpp Record.h
 	$(CXX) $(CPPFLAGS) -c Record.cpp
+helper.o: helper.cpp helper.h
+	$(CXX) $(CPPFLAGS) -c helper.cpp
 
 clean:
 	rm -f *.o minisql ../data/*.idx ../data/table.list

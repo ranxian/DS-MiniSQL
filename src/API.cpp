@@ -1,4 +1,5 @@
 #include "API.h"
+#include "helper.h"
 
 API::API() 
 {
@@ -26,8 +27,9 @@ int API::createTable() {
         return -1;
     } else {
         catalog_manager->createTable(info.t);
-        catalog_manager->findTable(info.tableName);
     }
+
+    sql_msg("TABLE " + tableName + " created");
     return 0;
 }
 
@@ -84,8 +86,9 @@ int API::deleteRecord() {
 }
 
 int API::getInput() {
-    interpreter->inputCommand();
-    return 0;
+    if (interpreter->inputCommand())
+        return 0;
+    else return -1;
 }
 
 int API::exit() {

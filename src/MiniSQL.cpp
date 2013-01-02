@@ -1,5 +1,6 @@
 #include "API.h"
 #include "MiniSQL.h"
+#include "helper.h"
 
 int main()
 {
@@ -9,7 +10,10 @@ int main()
     printf("+-------------------------+\n");
     while(1)
     {
-        api.getInput();
+        if (api.getInput() < 0) {
+            sql_error("Command format error");
+            continue;
+        }
         switch (api.commandType()) {
             case NONE:
                 break;
