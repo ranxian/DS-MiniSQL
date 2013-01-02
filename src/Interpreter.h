@@ -11,12 +11,14 @@ public:
     bool inputCommand();                                            
     // get condition tree
     void getCondition(std::vector<string> command, condition_tree_t * condition);  
-    // get the result after interpretion
+    // get the result after interpretation
     info_t getInfo();                         
     // print information for debug               
     void debug();    
 
-    Interpreter();                         
+    Interpreter(); 
+
+    ~Interpreter();                        
 
 private:
     /*--------------parse different types of commands------------------*/
