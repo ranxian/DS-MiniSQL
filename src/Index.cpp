@@ -222,7 +222,7 @@ int Index::deleteIndex(string tableName, string indexName, string value)
     // 存放读出来的索引项
     index_node_t *idxNode = new index_node_t[recNum];
     // 读出索引项 并 找到要删除的索引项
-    int deleteCnt;              // 第 deleteCnt 个索引项是要删除的索引项
+    int deleteCnt = 0;              // 第 deleteCnt 个索引项是要删除的索引项
     int writePos = readPos;     // 记录写指针位置
     // 更新读指针位置
     fs.seekg(readPos);
@@ -290,7 +290,7 @@ int Index::mergeIndexAND(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;
-    index_node_t *lastRes;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
+    index_node_t *lastRes = NULL;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
     curRes->nextNode = NULL;
 
     for (int i = 0; i < listNum; i++)
@@ -393,7 +393,7 @@ int Index::mergeIndexOR(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;
-    index_node_t *lastRes;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
+    index_node_t *lastRes = NULL;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
     curRes->nextNode = NULL;
 
     for (int i = 0; i < listNum; i++)
