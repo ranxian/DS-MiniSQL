@@ -48,7 +48,7 @@ int API::select() {
 
     record_manager->PrintHead(table);
     record_manager->Print(records);
-    return -1;
+    return 0;
 }
 
 int API::insert() {
