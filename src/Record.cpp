@@ -2,14 +2,9 @@
 Record.cpp
 */
 
-
-
 #include "Record.h"
-#include <stdlib.h>
-#include <iostream>
-using namespace std;
-/* 所有的文件的名字是表的名字后面加后缀.rec */
 
+/* 所有的文件的名字是表的名字后面加后缀.rec */
 
 /* 根据字段名返回字段值类型，0表示整形，1表示字符串，-1表示没有此字段,同时设置
 某个字段相对于每一条记录初始位置的偏移量，为Offset.attriLength为要查找的字段值所占的字节数 */
