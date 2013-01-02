@@ -1,8 +1,13 @@
 #include "Index.h"
 
-int Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
+int Index::selectIndex(string tableName, condition_tree_t *conditionNode, index_node_t *res)
 {
     fstream fin;
+
+    // 从条件树节点中获取信息
+    string tableName = conditionNode->leftOperand;
+    string value = conditionNode->rightOperand;
+    oper_t oper = conditionNode->opName;
 
     // 根据索引名找到索引文件
     string file = "../data/" + tableName + "_" + indexName + ".idx";
@@ -14,8 +19,68 @@ int Index::selectIndex(string tableName, string indexName, string valueFrom, str
 
     // 查找索引
     // 二分查找到要求索引的起始、结束地址
-    int from;
-    int to;
+    int from = 0;
+    int to = 0;
+    index_node_t *cur = res;
+    // ==
+    if (oper == NE)
+    {
+        from = IDXHEAD_SIZE_IN_FILE;
+        to = biSearchFrom(fin, 1, idxHd.recNum, value, idxHd.attr.type) - IDXNODE_SIZE_IN_FILE;
+
+        // cout << "--------------from: " << from << " to: " << to << endl;
+        
+        // 将所有索引项加入到 res 链表中
+        cur->nextNode = NULL;
+        // 更新写指针到第一个索引的起始地址
+        fin.seekg(from);
+        while (true)
+        {
+            // 将当前索引项加入链表
+            readNode(fin, *cur);
+            // 如果还有下一个索引项就申请空间
+            if ((int)fin.tellg() <= to)
+            {
+                cur->nextNode = new index_node_t;
+                cur = cur->nextNode;
+                cur->nextNode = NULL;
+            }
+            // 如果读到最后一个索引项了 退出循环
+            else
+            {
+                break;
+            }
+        }
+
+        from = biSearchTo(fin, 1, idxHd.recNum, value, idxHd.attr.type) + IDXNODE_SIZE_IN_FILE;
+        to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
+    }
+    // <>
+    else if (oper == EQ)
+    {
+
+    }
+    // >
+    else if (oper == GT)
+    {
+
+    }
+    // <
+    else if (oper == LT)
+    {
+        
+    }
+    // >=
+    else if (oper == GTE)
+    {
+        
+    }
+    // <=
+    else if (oper == LTE)
+    {
+        
+    }
+
     // 如果是要取出所有索引的话
     if (valueFrom == "ZHAODIAO" && valueTo == "ZHAODIAO")
     {
