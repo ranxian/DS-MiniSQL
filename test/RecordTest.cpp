@@ -33,7 +33,7 @@ int main()
     }
     
     //Test.Print(testRecord);
-    /*
+    
     //插入记录
     if (itp.inputCommand())
     {
@@ -41,7 +41,7 @@ int main()
         cout << "Insert return: " << Test.Insert(testInfo) << endl;;
         cout << "record inserted successfully!"  << endl;
     }
-    */
+    
 
     //查找记录并输出
     if (itp.inputCommand())
@@ -50,7 +50,15 @@ int main()
         //itp.debug(); 
         testRecord = Test.Select(testInfo);
         cout << "record selected successfully!" << endl;
-        Test.Print(testRecord);
+        if (testRecord != NULL)
+        {
+            Test.Print(testRecord);
+        }
+        else
+        {
+            cout << "record not found!!" << endl;
+        }
+        
         
 
     }
