@@ -5,7 +5,7 @@ int Index::selectIndex(string tableName, condition_tree_t *conditionNode, index_
     fstream fin;
 
     // 从条件树节点中获取信息
-    string tableName = conditionNode->leftOperand;
+    string indexName = conditionNode->leftOperand;
     string value = conditionNode->rightOperand;
     oper_t oper = conditionNode->opName;
 
@@ -22,7 +22,11 @@ int Index::selectIndex(string tableName, condition_tree_t *conditionNode, index_
     int from = 0;
     int to = 0;
     index_node_t *cur = res;
-    // ==
+    cur->nextNode = NULL;
+
+    // <> 
+    // NOTE: 注意，NE 的情况进行了两次添加 在该花括号内 以及函数最后
+    //       这是因为 NE 将集合分为了两个分离的待添加的子集
     if (oper == NE)
     {
         from = IDXHEAD_SIZE_IN_FILE;
@@ -31,7 +35,6 @@ int Index::selectIndex(string tableName, condition_tree_t *conditionNode, index_
         // cout << "--------------from: " << from << " to: " << to << endl;
         
         // 将所有索引项加入到 res 链表中
-        cur->nextNode = NULL;
         // 更新写指针到第一个索引的起始地址
         fin.seekg(from);
         while (true)
@@ -55,76 +58,40 @@ int Index::selectIndex(string tableName, condition_tree_t *conditionNode, index_
         from = biSearchTo(fin, 1, idxHd.recNum, value, idxHd.attr.type) + IDXNODE_SIZE_IN_FILE;
         to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
     }
-    // <>
+    // ==
     else if (oper == EQ)
     {
-
+        from = biSearchFrom(fin, 1, idxHd.recNum, value, idxHd.attr.type);
+        to = biSearchTo(fin, 1, idxHd.recNum, value, idxHd.attr.type);
     }
     // >
     else if (oper == GT)
     {
-
+        from = biSearchTo(fin, 1, idxHd.recNum, value, idxHd.attr.type) + IDXNODE_SIZE_IN_FILE;
+        to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
     }
     // <
     else if (oper == LT)
     {
-        
+        from = IDXHEAD_SIZE_IN_FILE;
+        to = biSearchFrom(fin, 1, idxHd.recNum, value, idxHd.attr.type) - IDXNODE_SIZE_IN_FILE;
     }
     // >=
     else if (oper == GTE)
     {
-        
+        from = biSearchFrom(fin, 1, idxHd.recNum, value, idxHd.attr.type);
+        to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
     }
     // <=
     else if (oper == LTE)
     {
-        
-    }
-
-    // 如果是要取出所有索引的话
-    if (valueFrom == "ZHAODIAO" && valueTo == "ZHAODIAO")
-    {
         from = IDXHEAD_SIZE_IN_FILE;
-        to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
-    }
-    // 否则
-    else
-    {
-        // 如果查找范围最小值不比第一个索引值大，那么从第一个索引开始收集
-        index_node_t firstNode;
-        fin.seekg(IDXHEAD_SIZE_IN_FILE);
-        readNode(fin, firstNode);
-        if (!lessThan(firstNode.value, valueFrom, idxHd.attr.type))
-        {
-            from = IDXHEAD_SIZE_IN_FILE;
-        }
-        // 否则，进行二分查找
-        else
-        {
-            fin.seekg(IDXHEAD_SIZE_IN_FILE);
-            from = biSearchFrom(fin, 1, idxHd.recNum, valueFrom, idxHd.attr.type);
-        }
-        // 如果查找范围最大值不比最后一个索引值小，那么收集到最后一个索引
-        index_node_t lastNode;
-        fin.seekg(IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE);
-        readNode(fin, lastNode);
-        if (!lessThan(valueTo, lastNode.value, idxHd.attr.type))
-        {
-            to = IDXHEAD_SIZE_IN_FILE + (idxHd.recNum - 1) * IDXNODE_SIZE_IN_FILE;
-        }
-        // 否则，进行二分查找
-        else
-        {
-            fin.seekg(IDXHEAD_SIZE_IN_FILE);
-            to = biSearchTo(fin, 1, idxHd.recNum, valueTo, idxHd.attr.type);
-        }
+        to = biSearchTo(fin, 1, idxHd.recNum, value, idxHd.attr.type);
     }
 
     // cout << "--------------from: " << from << " to: " << to << endl;
     
     // 将所有索引项加入到 res 链表中
-    index_node_t *cur = res;
-    cur->nextNode = NULL;
     // 更新写指针到第一个索引的起始地址
     fin.seekg(from);
     while (true)
