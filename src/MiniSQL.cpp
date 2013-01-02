@@ -5,9 +5,9 @@
 int main()
 {
     API api;
-    printf("+-------------------------+\n");
-    printf("| Welcome to use MiniSQL. |\n");
-    printf("+-------------------------+\n");
+    cout << "+-------------------------+" << endl
+         << "| Welcome to use MiniSQL. |" << endl
+         << "+-------------------------+" << endl; 
     while(1)
     {
         if (api.getInput() < 0) {

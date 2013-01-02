@@ -1,6 +1,14 @@
 #include "Index.h"
 
-int Index::selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
+int Index::selectIndex(string tableName, condition_tree_t *node, index_node_t *res) {
+    tableName = tableName;
+    node = node;
+    res = res;
+
+    return 0;
+}
+
+int Index::selectIndex_old(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res)
 {
     fstream fin;
 

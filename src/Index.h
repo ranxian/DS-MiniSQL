@@ -15,7 +15,8 @@ class Index
 {
 public:
     // 查找关键码为 value 的索引项
-    int selectIndex(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res);
+    int selectIndex(string tableName, condition_tree_t *node, index_node_t *res);
+    int selectIndex_old(string tableName, string indexName, string valueFrom, string valueTo, index_node_t *res);
     // 建立索引
     int createIndex(string tableName, string indexName, attr_t & attr);                           
     // 插入关键码为 value 的新索引项

@@ -28,6 +28,14 @@ int API::createTable() {
         return -1;
     } else {
         catalog_manager->createTable(info.t);
+        table_t table = catalog_manager->findTable(tableName);
+        for (int i = 0; i < table.attrNum; i++) {
+            index_manager->createIndex(
+                tableName,
+                table.attributes[i].name,
+                table.attributes[i]
+            );
+        }
     }
 
     sql_msg("TABLE \"" + tableName + "\" created");
@@ -51,7 +59,7 @@ int API::select() {
     record_t *records = record_manager->Select(info);
 
     record_manager->PrintHead(table);
-    
+
     record_manager->Print(records);
     return 0;
 }
@@ -119,3 +127,22 @@ int API::update() {
 cmd_t API::commandType() {
     return interpreter->getInfo().command;
 };
+
+index_node_t* API::getIndex(string tableName, condition_tree_t *node) {
+    index_node_t *res = new index_node_t;
+    index_node_t **temp = new index_node_t*[2];
+    if (node->end) {
+        index_manager->selectIndex(tableName, node, res);
+    } else {
+        index_node_t *res1 = getIndex(tableName, node->left);
+        index_node_t *res2 = getIndex(tableName, node->right);
+        temp[0] = res1;
+        temp[1] = res2;
+        if (node->logic == AND) {
+            index_manager->mergeIndexAND(temp, 2, res);
+        } else {
+            index_manager->mergeIndexOR(temp, 2, res);
+        }
+    }
+    return res;
+}
