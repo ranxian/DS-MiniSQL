@@ -94,6 +94,11 @@ bool Interpreter::parseCommand()
     /*
      * basic error checking of brackets
      */
+    if (command.size() == 0)
+    {
+        cout << "ERROR: BAD INPUT!\n";
+        return false;
+    } 
     for (i = 0; i < (int)command.size(); i++)
     {
         if (command[i] == "(")
