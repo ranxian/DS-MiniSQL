@@ -85,7 +85,7 @@ int API::dropTable() {
     info_t info = interpreter->getInfo();
 
     catalog_manager->deleteTable(info.t);
-    // TODO: record_manager->deleteTable(info.t)
+    record_manager->DeleteTable(info.tableName);
 
     return 0;
 }

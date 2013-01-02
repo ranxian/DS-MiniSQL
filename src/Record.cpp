@@ -668,4 +668,20 @@ void Record::PrintHead(table_t & table)
     cout << endl;
 }
 
-void DeleteTable(string tableName) { return ;}
+void Record::DeleteTable(string tableName) 
+{ 
+    //先打开对应的文件
+    string Filename;
+    //cout << "select_info.tableName=" << select_info.selectedTable[0] << endl;
+    Filename = "../data/" + tableName + ".rec";
+    char *filename = (char *)Filename.c_str(); 
+    //cout << "filename=" << filename << endl;
+
+    //output用来获取文件末的偏移
+    ofstream output; 
+    output.open(filename, ios::binary|ios::out);
+    
+    output.close();
+   
+    return ;
+}
