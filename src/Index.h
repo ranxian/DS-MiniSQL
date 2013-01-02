@@ -30,6 +30,9 @@ public:
     int mergeIndexOR(index_node_t **list, int listNum, index_node_t *res);    
     Index();
     ~Index();
+
+    // 输出所有索引 用于 DEBUG
+    void debugPrint(string tableName, string indexName);
 private:
     // 二分查找，返回关键码为 value 的节点的起始地址，给 update 使用
     inline int biSearch(fstream & fin, int from, int to, string value, attrtype_t type);
@@ -47,6 +50,7 @@ private:
     inline void writeHead(fstream & fout, index_head_t & head);
     inline void readNode(fstream & fin, index_node_t & node);
     inline void writeNode(fstream & fout, index_node_t & node);
+
 };
 
 #endif

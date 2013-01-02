@@ -161,9 +161,10 @@ int Index::insertIndex(string tableName, string indexName, index_node_t & node)
             insertPos = recNum + 1;   // 插入的位置，若在第一个到最后一个索引之间没有找到插入位置，则默认插入到最后
             for (int i = 0; i < recNum - 1; i++)
             {
+                // cout << "this node: " << idxNode[i].value << endl;
                 // 满足该条件时插到 i 和 i + 1 之间
-                if (lessThan(idxNode[i].value, node.value, type) &&
-                    lessThan(node.value, idxNode[i + 1].value, type))
+                if (!lessThan(idxNode[i + 1].value, node.value, type) &&
+                    !lessThan(node.value, idxNode[i].value, type))
                 {
                     insertPos = i + 2;
                     break;
@@ -231,10 +232,9 @@ int Index::deleteIndex(string tableName, string indexName, string value)
         if (idxNode[i].value == value)
         {
             deleteCnt = i;
-            break;
         }
-        writePos = fs.tellp();
     }
+    writePos = IDXHEAD_SIZE_IN_FILE + deleteCnt * IDXNODE_SIZE_IN_FILE;
 
     // 将写指针放到第 deletePos 个索引项的开头
     // 写第 deletePos + 1 及其后面的所有索引项
@@ -511,7 +511,7 @@ int Index::biSearchFrom(fstream & fin, int from, int to, string value, attrtype_
         return biSearchFrom(fin, mid + 1, to, value, type);
     }
     // 继续查询左半部分
-    else if (lessThan(value, curValue, type))
+    else if (!lessThan(curValue, value, type))
     {
         return biSearchFrom(fin, from, mid - 1, value, type);
     } 
@@ -539,20 +539,15 @@ int Index::biSearchTo(fstream & fin, int from, int to, string value, attrtype_t 
     string curValue = curIdxNode.value;
     string prevValue = prevIdxNode.value;
 
-    // 当前节点关键码等于 value
-    if (!lessThan(value, prevValue, type) && 
-        !lessThan(value, curValue, type))
-    {
-        return pos;
-    }
+
     // 当前节点是 “第一个” 关键码大于 value 的节点时，返回 前面一个节点的其实地址 :]
-    else if (!lessThan(value, prevValue, type) &&
+    if (!lessThan(value, prevValue, type) &&
         lessThan(value, curValue, type))
     {
         return pos - IDXNODE_SIZE_IN_FILE;
     }
     // 继续查询右半部分
-    else if (lessThan(curValue, value, type))
+    else if (!lessThan(value, curValue, type))
     {
         return biSearchTo(fin, mid + 1, to, value, type);
     }
@@ -646,4 +641,38 @@ Index::Index()
 Index::~Index()
 {
 
+}
+
+void Index::debugPrint(string tableName, string indexName)
+{
+    fstream fin;
+
+    // 根据索引名找到索引文件
+    string file = "../data/" + tableName + "_" + indexName + ".idx";
+    fin.open(file.c_str(), ios::in | ios::binary);
+
+    // 读出索引头
+    index_head_t idxHd;
+    readHead(fin, idxHd);
+
+    cout << "record num = " << idxHd.recNum << endl;
+
+    if (idxHd.recNum == 0)
+    {
+        return;
+    }
+
+    cout << "---records:" << endl;
+    for (int i = 1; i <= idxHd.recNum; i++)
+    {
+        cout << i << ": " << endl;
+        index_node_t tmp;
+        readNode(fin, tmp);
+        cout << "  value: " << tmp.value << endl;
+        cout << "  offset: " << tmp.offset << endl;
+        cout << "  pos: " << IDXHEAD_SIZE_IN_FILE + IDXNODE_SIZE_IN_FILE * (i - 1) << endl;
+    }
+    cout << endl;
+
+    fin.close();
 }

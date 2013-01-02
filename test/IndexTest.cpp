@@ -61,22 +61,24 @@ int main()
 
     // 删除索引项
     cout << "---删除索引项：" << endl;
-    IndexManager.deleteIndex("Persons", "学号", "1100099999");
+    IndexManager.deleteIndex("Persons", "学号", "1100012957");
     cout << endl;
 
     // 更新索引项
     cout << "---更新索引项：" << endl;
-    IndexManager.updateIndex("Persons", "学号", "1100012957", "1100012958");
+    IndexManager.updateIndex("Persons", "学号", "1100099999", "1100199999");
     cout << endl;
 
     // 查找索引项
     cout << "---查找索引项：" << endl;
-    IndexManager.selectIndex("Persons", "学号", "1100012958", "1100012958", &res);
+    IndexManager.selectIndex("Persons", "学号", "1100012950", "1100012958", &res);
     printNode(&res);
     cout << endl;
 
     // 恢复一条索引
+    // IndexManager.debugPrint("Persons", "学号");
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
+    // IndexManager.debugPrint("Persons", "学号");
 
     // OR 合并索引列表
     index_node_t ORres, ORres1, ORres2;
@@ -95,7 +97,7 @@ int main()
     cout << endl;
 
     // 恢复一条索引
-    IndexManager.updateIndex("Persons", "学号", "1100012958", "1100012957");
+    IndexManager.updateIndex("Persons", "学号", "1100012950", "1100012957");
 
     // AND 合并索引列表
     index_node_t ANDres, ANDres1, ANDres2;
@@ -112,6 +114,20 @@ int main()
     delete [] tmp;
     cout << endl;
 
+    // 尝试搜索具有相同关键码的多个索引项
+    index_node_t selRes;
+    cout << "---搜索具有相同关键码的多个索引项：" << endl;
+    // IndexManager.debugPrint("Persons", "学号");
+    IndexManager.insertIndex("Persons", "学号", insertNode[2]);
+    IndexManager.insertIndex("Persons", "学号", insertNode[2]);
+    IndexManager.insertIndex("Persons", "学号", insertNode[2]);
+    IndexManager.selectIndex("Persons", "学号", "1100099999", "1100099999", &selRes);
+    printNode(&selRes);
 
+    // 删除一条索引后再搜索
+    IndexManager.deleteIndex("Persons", "学号", "1100099999");
+    IndexManager.selectIndex("Persons", "学号", "1100012956", "1100099999", &selRes);
+    printNode(&selRes);
+    cout << endl;
 
 }
