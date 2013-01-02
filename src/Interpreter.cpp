@@ -1,5 +1,7 @@
 # include "Interpreter.h"
 # include <string.h>
+# include <iostream>
+using namespace std;
 
 
 Interpreter::Interpreter()
@@ -100,13 +102,13 @@ bool Interpreter::parseCommand()
             count--;
         if (count < 0)
         {
-            printf("Brackets doesn't match. Please check again.\n");
+            cout << "Brackets doesn't match. Please check again.\n";
             return false;
         }
     }
     if (count != 0)
     {
-        printf("Brackets doesn't match. Please check again.\n");
+        cout << "Brackets doesn't match. Please check again.\n";
         return false;
     }
 
@@ -138,7 +140,7 @@ bool Interpreter::parseCommand()
         /*
          * No such type of command
          */
-        printf("Command '%s' invalid. Please check again.\n",command[0].c_str());
+        cout << "Command " << command[0] << " invalid. Please check again.\n";
         return false;
     }
 }
@@ -162,7 +164,7 @@ bool Interpreter::parseCreate() // OK
      */
     if (command.size() < 7)
     {
-        printf("Syntax error in create command. Need more input.\n");
+        cout << "Syntax error in create command. Need more input.\n";
         return false;
     }
     info.tableName = command[2];
@@ -174,7 +176,7 @@ bool Interpreter::parseCreate() // OK
          */
         if (i == (int)command.size())
         {
-            printf("Syntax error in Create cmmand. (Forget the ')' ?)\n");
+            cout << "Syntax error in Create cmmand. (Forget the ')' ?)\n";
             return false;
         }
         // Get attribute name
@@ -201,7 +203,7 @@ bool Interpreter::parseCreate() // OK
              * Error handling
              * No such type
              */
-            printf("The type '%s' is not supported. Please check again.\n",command[i].c_str() );
+            cout << "The type " << command[i] << " is not supported. Please check again.\n";
             info.command = NONE;
             return false;
         }
@@ -250,7 +252,7 @@ bool Interpreter::parseDrop()   //OK
      */
     if (command.size() != 3)
     {
-        printf("Syntax error in drop command. Please check again\n");
+        cout << "Syntax error in drop command. Please check again\n";
         return false;
     }
     info.tableName = command[2];
@@ -266,7 +268,7 @@ bool Interpreter::parseSelect() //OK
      */
     if (command.size() == 1)
     {
-        printf("'select' command need more input.\n");
+        cout << "'select' command need more input.\n";
         return false;
     }
     int i = 1;
@@ -280,7 +282,7 @@ bool Interpreter::parseSelect() //OK
          */
         if (i == (int)command.size())
         {
-            printf("Systax error: No talbe specified\n");
+            cout << "Systax error: No talbe specified\n";
             return false;
         }   
     }
@@ -290,13 +292,13 @@ bool Interpreter::parseSelect() //OK
      */
     if (i == 1)
     {
-        printf("No columns selected. Please check again.\n");
+        cout << "No columns selected. Please check again.\n";
         return false;
     }
     i++;
     if (i == (int)command.size())
     {
-        printf("Systax error: No talbe specified\n");
+       cout << "Systax error: No talbe specified\n";
         return false;
 
     }
@@ -330,7 +332,7 @@ bool Interpreter::parseDelete() //OK
     info.command = DELETE;
     if (command.size() < 3)
     {
-        printf("Syntax error in delete command. Please check again\n");
+        cout << "Syntax error in delete command. Please check again\n";
         return false;
     }
     info.tableName = command[2];
@@ -366,7 +368,7 @@ bool Interpreter::parseInsert()  //OK
     info.command = INSERT;
     if (command.size() < 3)
     {
-        printf("Systax error. Need more input\n");
+        cout << "Systax error. Need more input\n";
         return false;
     }
     info.tableName = command[2];
@@ -382,7 +384,7 @@ bool Interpreter::parseInsert()  //OK
         index2++;
         if (index2 == (int)command.size())
         {
-            printf("Systax error in insert command. Please check again.\n");
+            cout << "Systax error in insert command. Please check again.\n";
             return false;
         }
     }
@@ -396,7 +398,7 @@ bool Interpreter::parseInsert()  //OK
         //printf("%d %d\n",index1, index2 );
         if (index2 == (int)command.size())
         {
-            printf("Systax error in insert command. Please check again.\n");
+            cout << "Systax error in insert command. Please check again.\n";
             return false;
         }
     }
@@ -408,13 +410,13 @@ bool Interpreter::parseUpdate() //OK
     info.command = UPDATE;
     if (command.size() == 1)
     {
-        printf("No table specified. Please check again\n");
+        cout << "No table specified. Please check again\n";
         return false;
     }
     info.tableName = command[1];
     if (command.size() < 6 )
     {
-        printf("Systax error. Update command needs more input\n");
+        cout << "Systax error. Update command needs more input\n";
         return false;
     }
     int index1 = 3;
@@ -474,13 +476,13 @@ condition_tree_t * Interpreter::makeTree(int index)
                 ptr->opName = LTE;
             else
             {
-                printf("Syntax error in condition expression.\n" );
+                cout << "Syntax error in condition expression.\n";
                 return NULL;
             }
             i++;
             if (i == (int)command.size())
             { 
-                printf("Syntax error in condition expression.\n");
+                cout << "Syntax error in condition expression.\n";
                 return NULL;
             }
             ptr->rightOperand = command[i];
