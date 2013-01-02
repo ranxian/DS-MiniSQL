@@ -11,7 +11,7 @@ int main()
     cout << flush;    
     while(1)
     {
-        cout << "MiniSQL>";
+        cout << "MiniSQL> " << flush;
         if (api.getInput() < 0) {
             sql_error("Command format error");
             continue;
