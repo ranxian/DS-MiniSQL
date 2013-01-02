@@ -161,9 +161,10 @@ int Index::insertIndex(string tableName, string indexName, index_node_t & node)
             insertPos = recNum + 1;   // 插入的位置，若在第一个到最后一个索引之间没有找到插入位置，则默认插入到最后
             for (int i = 0; i < recNum - 1; i++)
             {
+                // cout << "this node: " << idxNode[i].value << endl;
                 // 满足该条件时插到 i 和 i + 1 之间
-                if (lessThan(idxNode[i].value, node.value, type) &&
-                    lessThan(node.value, idxNode[i + 1].value, type))
+                if (!lessThan(idxNode[i + 1].value, node.value, type) &&
+                    !lessThan(node.value, idxNode[i].value, type))
                 {
                     insertPos = i + 2;
                     break;
@@ -231,10 +232,9 @@ int Index::deleteIndex(string tableName, string indexName, string value)
         if (idxNode[i].value == value)
         {
             deleteCnt = i;
-            break;
         }
-        writePos = fs.tellp();
     }
+    writePos = IDXHEAD_SIZE_IN_FILE + deleteCnt * IDXNODE_SIZE_IN_FILE;
 
     // 将写指针放到第 deletePos 个索引项的开头
     // 写第 deletePos + 1 及其后面的所有索引项
@@ -276,9 +276,9 @@ int Index::updateIndex(string tableName, string indexName, string value, string 
     // 更新要求索引项
     curIdxNode.value = newValue;
 
-    // 将更新了的索引项写回文件
-    fs.seekp(pos);
-    writeNode(fs, curIdxNode);
+    // 为了保持更新后有序 先删除该索引项 再将更新过的索引项插入到合适位置
+    deleteIndex(tableName, indexName, value);
+    insertIndex(tableName, indexName, curIdxNode);
 
     fs.close();
 
@@ -286,7 +286,110 @@ int Index::updateIndex(string tableName, string indexName, string value, string 
     return 0;
 }
 
-int Index::mergeIndex(index_node_t **list, int listNum, index_node_t *res)
+int Index::mergeIndexAND(index_node_t **list, int listNum, index_node_t *res)
+{
+    index_node_t *curRes = res;
+    int resNum = 0;
+    index_node_t *lastRes;  // 标记结果列表中最后一个节点，用于删除最后多申请的一个节点
+    curRes->nextNode = NULL;
+
+    for (int i = 0; i < listNum; i++)
+    {
+        index_node_t *curNode = list[i];
+        // 将 list[i] 中的节点加入结果列表
+        while (true)
+        {
+            // 查找其他列表中是否都存在和 curNode 一样的节点
+            bool curValid = true;   // 是否要将 curNode 添加到 res 中
+            for (int j = 0; j < listNum; j++)
+            {
+                index_node_t *cmpNode = list[j];
+                // 查看列表 list[j] 中是否存在和 curNode 一样的节点
+                bool exist = false;
+                while (true)
+                {
+                    if (cmpNode->offset == curNode->offset)
+                    {
+                        exist = true;
+                        break;
+                    }
+                    // 若没有下一个节点 退出当前列表 合并下一个列表
+                    if (curNode->nextNode == NULL)
+                    {
+                        break;
+                    }
+                    // 若有下一个节点 继续合并当前列表
+                    else
+                    {
+                        curNode = curNode->nextNode;
+                    }
+                }
+                // 如果 list[j] 中没有和 curNode 一样的节点，可以判定 curNode 是无须加入的
+                if (!exist)
+                {
+                    curValid = false;
+                    break;
+                }
+                // 如果 list[j] 中有和 curNode 一样的节点，继续查看下一个列表
+                else
+                {
+                    continue;
+                }
+            }
+
+            // 如果 curNode 须加入 res 的，加入之
+            if (curValid)
+            {
+                // 查找结果列表中是否已存在当前节点
+                bool exist = false;
+                if (resNum > 0)
+                {
+                    index_node_t *tmp = res;
+                    for (int i = 0; i < resNum; i++)
+                    {
+                        if (tmp->value == curNode->value)
+                        {
+                            exist = true;
+                            break;
+                        }
+                        tmp = tmp->nextNode;
+                    }
+                }
+                // 如果结果列表中不存在当前节点 才把当前节点加入结果列表
+                if (!exist)
+                {
+                    curRes->value = curNode->value;
+                    curRes->offset = curNode->offset;
+                    resNum++;
+                    // 在这里会导致最后多申请一个节点，需要删除之
+                    curRes->nextNode = new index_node_t; 
+                    lastRes = curRes;
+                    curRes = curRes->nextNode;
+                }
+            }
+
+            // 若没有下一个节点 退出当前列表 合并下一个列表
+            if (curNode->nextNode == NULL)
+            {
+                break;
+            }
+            // 若有下一个节点 继续合并当前列表
+            else
+            {
+                curNode = curNode->nextNode;
+            }
+        }
+    }
+
+    // 删除多余的一个节点
+    delete lastRes->nextNode;
+    lastRes->nextNode = NULL;
+
+    // 成功返回 0
+    return 0;
+}
+
+int Index::mergeIndexOR(index_node_t **list, int listNum, index_node_t *res)
 {
     index_node_t *curRes = res;
     int resNum = 0;
@@ -408,7 +511,7 @@ int Index::biSearchFrom(fstream & fin, int from, int to, string value, attrtype_
         return biSearchFrom(fin, mid + 1, to, value, type);
     }
     // 继续查询左半部分
-    else if (lessThan(value, curValue, type))
+    else if (!lessThan(curValue, value, type))
     {
         return biSearchFrom(fin, from, mid - 1, value, type);
     } 
@@ -436,20 +539,15 @@ int Index::biSearchTo(fstream & fin, int from, int to, string value, attrtype_t 
     string curValue = curIdxNode.value;
     string prevValue = prevIdxNode.value;
 
-    // 当前节点关键码等于 value
-    if (!lessThan(value, prevValue, type) && 
-        !lessThan(value, curValue, type))
-    {
-        return pos;
-    }
+
     // 当前节点是 “第一个” 关键码大于 value 的节点时，返回 前面一个节点的其实地址 :]
-    else if (!lessThan(value, prevValue, type) &&
+    if (!lessThan(value, prevValue, type) &&
         lessThan(value, curValue, type))
     {
         return pos - IDXNODE_SIZE_IN_FILE;
     }
     // 继续查询右半部分
-    else if (lessThan(curValue, value, type))
+    else if (!lessThan(value, curValue, type))
     {
         return biSearchTo(fin, mid + 1, to, value, type);
     }
@@ -543,4 +641,38 @@ Index::Index()
 Index::~Index()
 {
 
+}
+
+void Index::debugPrint(string tableName, string indexName)
+{
+    fstream fin;
+
+    // 根据索引名找到索引文件
+    string file = "../data/" + tableName + "_" + indexName + ".idx";
+    fin.open(file.c_str(), ios::in | ios::binary);
+
+    // 读出索引头
+    index_head_t idxHd;
+    readHead(fin, idxHd);
+
+    cout << "record num = " << idxHd.recNum << endl;
+
+    if (idxHd.recNum == 0)
+    {
+        return;
+    }
+
+    cout << "---records:" << endl;
+    for (int i = 1; i <= idxHd.recNum; i++)
+    {
+        cout << i << ": " << endl;
+        index_node_t tmp;
+        readNode(fin, tmp);
+        cout << "  value: " << tmp.value << endl;
+        cout << "  offset: " << tmp.offset << endl;
+        cout << "  pos: " << IDXHEAD_SIZE_IN_FILE + IDXNODE_SIZE_IN_FILE * (i - 1) << endl;
+    }
+    cout << endl;
+
+    fin.close();
 }

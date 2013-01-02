@@ -12,12 +12,20 @@ using namespace std;
 
 
 /* 根据字段名返回字段值类型，0表示整形，1表示字符串，-1表示没有此字段,同时设置
-某个字段相对于每一条记录初始位置的偏移量，为offset */
+某个字段相对于每一条记录初始位置的偏移量，为Offset.attriLength为要查找的字段值所占的字节数 */
 int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLength)
 {
     int i;
     Offset = 0;
     attriLength = 0;
+    cout << "attrnum= " << table.attrNum << endl;
+    /*
+    for (i=0; i<table.attrNum; i++)
+    {
+        cout << "attributes " <<i<<".length= " << table.attributes[i].length<<endl;
+    }
+    */
+
     for (i=0; i<table.attrNum; i++)
     {
         if (i != 0)
@@ -27,7 +35,10 @@ int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLengt
         
         if (table.attributes[i].name == infoName)
         {
+            //cout << "Offset= "<< Offset<<endl;
+
             attriLength = table.attributes[i].length;
+            //cout << "attriLength= " << attriLength << endl;
             if (table.attributes[i].type == CHAR)
                 return 1;
             else if (table.attributes[i].type == INT)
@@ -44,14 +55,18 @@ int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLengt
 int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, ifstream &input)
 {
     
-    //如果某一个子树返回-1，直接不用判断，一层层向上返回-1
-    if ((Judge(tempCondition->left, offset, table, input) == -1) || 
-        (Judge(tempCondition->right, offset, table, input) == -1))
-        return -1;
 
     //如果不是叶节点
-    else if(!tempCondition->end)
+    if(!tempCondition->end)
     {
+        
+        cout << "内部节点！" << endl;
+        //如果某一个子树返回-1，直接不用判断，一层层向上返回-1
+        if ((Judge(tempCondition->left, offset, table, input) == -1) || 
+            (Judge(tempCondition->right, offset, table, input) == -1))
+            return -1;
+
+        
         //如果逻辑符号为与的情况
         if (tempCondition->logic == AND)
             return (Judge(tempCondition->left, offset, table, input) & 
@@ -65,6 +80,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
     else
     {
         
+        cout << "叶节点！" << endl;
         //此变量用来标记某个字段之相对于这个记录首地址的偏移，即attriOffset>=0 && 
         //attriOffset <= recordLength-最后一条记录的长度
         int attriOffset = 0;
@@ -77,11 +93,16 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
         
         //剩下的情况字段值都不为空
         //要判断字符串的情况,此时应该只有等于和不等于两种情况？
-        if (getInfo(table, tempCondition->leftOperand, attriOffset, attriLength) == 1)
+        //recordItemType用来标记所查询的字段是整形的还是字符串
+        int recordItemType = getInfo(table, 
+            tempCondition->leftOperand, attriOffset, attriLength);
+        if (recordItemType == 1)
         {
             //定位到相应的字段值首地址
+            cout << "比较字符串！" << endl;
             input.seekg(offset + attriOffset, ios::beg);
             input.read((char *)outChar, attriLength);
+
             //将读出的字符串变为string类
             string out = outChar;
             if (out == "oop")
@@ -106,21 +127,24 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
             }
         }
         //此种情况为比较整型变量
-        else if(getInfo(table, tempCondition->leftOperand, attriOffset, attriLength) == 0)
+        else if(recordItemType == 0)
         {
+            cout << "比较整形变量！" << endl;
             //定位到相应的字段值首地址
             input.seekg(offset + attriOffset, ios::beg);
             input.read((char *)outChar, attriLength);
             //将读出的字符串变为string类
             string out = outChar;
+            //cout << "以字符串形式表达为" << outChar << endl;
             if (out == "oop")
                 return -1;
             //将字段值取出，以整形存储
             int outInt = 0;
             //定位到相应的字段值首地址
             input.seekg(offset + attriOffset, ios::beg);
-
-            input.read((char *)&outInt, attriLength);
+            //cout << "offset=" << offset << " attriOffset= " << attriOffset<<endl;
+            input.read((char *)(&outInt), sizeof(outInt));
+            cout << "attriLength= "<<attriLength<<endl;
             //将右值rightOperand转换为整型值
             char *rightNum = (char *)tempCondition->rightOperand.c_str();
             int rightnum = atoi(rightNum);
@@ -128,13 +152,23 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
             switch (tempCondition->opName)
             {
                 case EQ:
+                    cout << "==" << endl;
+                    cout << "outInt= " << outInt << "  rightnum= " << rightnum << endl;
                     if (outInt == rightnum)
+                    {
+                        cout << "found!" << endl;
                         return 1;
+                    }   
                     else
+                    {
+                        cout << "not found!" << endl;
                         return 0;
+                    }
+                        
                     break;
 
                 case NE:
+                    cout << "!=" <<endl;
                     if (outInt != rightnum)
                         return 1;
                     else 
@@ -142,6 +176,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                     break;
 
                 case GT:
+                    cout << ">" << endl;
                     if (outInt > rightnum)
                         return 1;
                     else 
@@ -149,6 +184,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                     break;
 
                 case LT:
+                    cout << "<" << endl;
                     if (outInt < rightnum)
                         return 1;
                     else 
@@ -156,6 +192,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                     break;
 
                 case GTE:
+                    cout << ">=" <<endl;
                     if (outInt >= rightnum)
                         return 1;
                     else
@@ -163,6 +200,7 @@ int Record::Judge(condition_tree_t * tempCondition, int offset, table_t table, i
                     break;
 
                 default:
+                    cout << "<=" <<endl;
                     if (outInt <= rightnum)
                         return 1;
                     else 
@@ -189,7 +227,8 @@ int Record::Insert(info_t & insert_info)
     int i;
 
     ofstream output;
-    output.open(filename, ios::app|ios::binary|ios::out);
+    output.open(filename, ios::binary|ios::out);
+    //output.open(filename, ios::app|ios::binary|ios::out);
     //此时记录下文件的偏移
     int offset = (int)output.tellp();
     map<string, string> ::iterator iter;
@@ -233,7 +272,7 @@ int Record::Insert(info_t & insert_info)
 
 
     }
-
+    output.close();
     return offset;
 
 }
@@ -242,7 +281,7 @@ int Record::Insert(info_t & insert_info)
 void Record::Delete(info_t & delete_info, index_node_t & index)         
 {
     string Filename;
-    Filename = "\"" + delete_info.tableName + ".rec\"";
+    Filename = "../data/" + delete_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
     ofstream output;
     output.open(filename, ios::binary|ios::app|ios::out);
@@ -256,6 +295,8 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
     {
         output.write((char *)temp.c_str(), target.attributes[i].length);
     }
+    output.close();
+    return;
 }
 
 
@@ -263,7 +304,7 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
 void Record::Update(info_t & update_info, index_node_t & index)
 {
     string Filename;
-    Filename = "\"" + update_info.tableName + ".rec\"";
+    Filename = "../data/" + update_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
     ofstream output;
     output.open(filename, ios::binary|ios::app|ios::out);
@@ -297,6 +338,8 @@ void Record::Update(info_t & update_info, index_node_t & index)
         }
 
     }
+    output.close();
+    return;
 
     
 }
@@ -306,14 +349,22 @@ record_t  *Record::Select(info_t & select_info)
 {
     //先打开对应的文件
     string Filename;
-    Filename = "\"" + select_info.tableName + ".rec\"";
-    char *filename = (char *)Filename.c_str();  
+    //cout << "select_info.tableName=" << select_info.selectedTable[0] << endl;
+    Filename = "../data/" + select_info.selectedTable[0] + ".rec";
+    char *filename = (char *)Filename.c_str(); 
+    //cout << "filename=" << filename << endl;
+
+    //output用来获取文件末的偏移
+    ofstream output; 
+    output.open(filename, ios::binary|ios::app|ios::in);
+    int curEnd = (int)output.tellp();
+    output.close();
     ifstream input;
-    input.open(filename, ios::binary|ios::app|ios::in);
+    input.open(filename, ios::binary|ios::in);
 
-
+    //
     //curEnd表示文件末位距离文件首的偏移
-    int curEnd = (int) input.tellg();
+    cout << "curEnd= " << curEnd << endl;
     //建立一个链表，链表节点为一条条符合条件的完整的记录，head为整个链表的头指针
     //返回值为head的next指针
     record_t *head = new record_t;
@@ -322,23 +373,19 @@ record_t  *Record::Select(info_t & select_info)
     //如果出现一个符合要求的记录，就包装成一个结构体record_t,并使move->next指向它
     //然后移动move，即move = move->next
 
-
-
     //condition指针指向整个条件树的根节点
     condition_tree_t *condition = select_info.tree;
     int i,j;
-    
-
-
     //i表示每一条记录的首地址偏移
-    for(i=0; i!=curEnd; i+=select_info.t.recordLength)
+    for(i=0; i<curEnd; i+=select_info.t.recordLength)
     {
-        
+        //cout << "文件指针： " << i << endl;
 
         if(Judge(condition, i, select_info.t, input) == 1)
         {
             
             
+            cout << "record found!" << endl;
             //以下部分为将一条记录打包成record_t的工作
 
             //将文件读指针移动到记录头
@@ -397,7 +444,7 @@ record_t  *Record::Select(info_t & select_info)
                
         }
     }
-
+    input.close();
     return head->next;
 
 }

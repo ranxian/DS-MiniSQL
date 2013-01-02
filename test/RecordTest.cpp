@@ -1,12 +1,80 @@
 #include "../src/MiniSQL.h"
 #include "../src/Record.h"
+#include "../src/Record.cpp"
+#include "../src/Interpreter.cpp"
+#include "../src/Interpreter.h"
 
 
 int main()
 {
-    Record testRecord;
     
-    table_t table;
+
+    Interpreter itp;
+    Record Test;
+    info_t testInfo;
+    record_t *testRecord;
+    
+    //建表，输出表字段信息
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+    //Test.Insert(testInfo);
+        Test.PrintHead(testInfo.t);
+        cout << "table built successfully!" << endl;
+    }
+    
+
+    //插入记录
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        cout << "record inserted successfully!"  << endl;
+    }
+    
+    //Test.Print(testRecord);
+    /*
+    //插入记录
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        cout << "Insert return: " << Test.Insert(testInfo) << endl;;
+        cout << "record inserted successfully!"  << endl;
+    }
+    */
+
+    //查找记录并输出
+    if (itp.inputCommand())
+    {
+        testInfo = itp.getInfo();
+        //itp.debug(); 
+        testRecord = Test.Select(testInfo);
+        cout << "record selected successfully!" << endl;
+        Test.Print(testRecord);
+        
+
+    }
+    
+
+
+    /*
+    while(1)
+    {
+        if (itp.inputCommand())
+        {
+            
+            testRecord = Test.select(testInfo)
+
+        }
+
+         
+    }
+    
+
+    */
+
+
+    /*
     table.name = "Persons";
     table.attrNum = 3;
     table.recordLength = 68;
@@ -23,7 +91,26 @@ int main()
     table.attributes[2].length = 8;
     table.attributes[2].type = INT;
 
+    Record testRecord;
+    
+    table_t table;
+    info_t info;
+    
+    
+    record_t * record = new record_t;
+    record->next = NULL;
+    record->value = NULL;
+    record->value = new value_t;
+    record->value->type = CHAR;
+    record->value->str_value = "hehehaha";
+    record->value->next = new value_t;
+    record->value->next->type = INT;
+    record->value->next->int_value = 12;
+    record->value->next->next = NULL;
+
     testRecord.PrintHead(table);
+    testRecord.Print(record);
+    */
     /*
     // 初始化表
     CatalogManager.initTable();

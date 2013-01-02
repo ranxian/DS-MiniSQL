@@ -24,10 +24,15 @@ public:
     int deleteIndex(string tableName, string indexName, string value);                           
     // 更新关键码为 value 的索引项，新关键码为 newValue
     int updateIndex(string tableName, string indexName, string value, string newValue);
-    // 合并多个索引项链表，结果放在 res 中
-    int mergeIndex(index_node_t **list, int listNum, index_node_t *res);          
+    // 取多个索引项链表的交集（要求这些索引属于同一个表），结果放在 res 中
+    int mergeIndexAND(index_node_t **list, int listNum, index_node_t *res);        
+    // 取多个索引项链表的并集，结果放在 res 中
+    int mergeIndexOR(index_node_t **list, int listNum, index_node_t *res);    
     Index();
     ~Index();
+
+    // 输出所有索引 用于 DEBUG
+    void debugPrint(string tableName, string indexName);
 private:
     // 二分查找，返回关键码为 value 的节点的起始地址，给 update 使用
     inline int biSearch(fstream & fin, int from, int to, string value, attrtype_t type);
@@ -45,6 +50,7 @@ private:
     inline void writeHead(fstream & fout, index_head_t & head);
     inline void readNode(fstream & fin, index_node_t & node);
     inline void writeNode(fstream & fout, index_node_t & node);
+
 };
 
 #endif

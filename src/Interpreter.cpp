@@ -8,6 +8,11 @@ Interpreter::Interpreter()
     info.tableName = "";
 }
 
+Interpreter::~Interpreter()
+{
+    clearInfo();
+}
+
 bool Interpreter::inputCommand()
 {
     getline(cin, input, ';');
@@ -29,7 +34,7 @@ bool Interpreter::parseCommand()
 
 
     /*
-     * CUT the input into pieces for interprete
+     * CUT the input into pieces for interpreting
      * deal with ()<> carefully
      */
     while (start != string::npos)
@@ -298,6 +303,7 @@ bool Interpreter::parseSelect() //OK
     while (strcasecmp(command[i].c_str(),"where"))
     {
         info.selectedTable.push_back(command[i]);
+        info.tableName = command[i];
         i++;
         if (i == (int)command.size())
         {
