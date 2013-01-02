@@ -34,6 +34,7 @@ public:
     void help();
     // 命令类型
     cmd_t commandType();
+    index_node_t* getIndex(string tableName, condition_tree_t *node);
 private:
     Catalog *catalog_manager;
     Index *index_manager;
