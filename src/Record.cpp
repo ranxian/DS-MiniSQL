@@ -456,25 +456,30 @@ record_t  *Record::Select(info_t & select_info)
 /* 输出一条记录 */
 void Record::Print(record_t * record)
 {
-    value_t *link = record->value; 
-    while (link != NULL)
+    while (record != NULL)
     {
-        //如果记录为空
-        if (link->type == NOATTR)
+        value_t *link = record->value; 
+        while (link != NULL)
         {
-            cout << "NULL ";
+            //如果记录为空
+            if (link->type == NOATTR)
+            {
+                cout << "NULL ";
+            }
+            else if (link->type == CHAR)
+            {
+                cout << link->str_value << " ";
+            }
+            else
+            {
+                cout << link->int_value << " ";
+            }
+            link = link->next;
         }
-        else if (link->type == CHAR)
-        {
-            cout << link->str_value << " ";
-        }
-        else
-        {
-            cout << link->int_value << " ";
-        }
-        link = link->next;
+        cout << endl;
+        record = record->next;
     }
-    cout << endl;
+    
 }
 
 /* 用来输出一个表的字段信息 */
