@@ -365,6 +365,7 @@ void Interpreter::clearInfo()
     info.selectedItems.clear();
     info.selectedTable.clear();
     info.insertItems.clear();
+    info.updateItems.clear();
 }
 
 bool Interpreter::parseInsert()  //OK
