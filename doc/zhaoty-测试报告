@@ -1,0 +1,8 @@
+方式：单元测试
+模块：1. Index 2. Catalog
+文件：DS-MiniSQL/test/IndexTest.cpp
+     DS-MiniSQL/test/CatalogTest.cpp
+编译方法：在 test 目录下：
+        g++ -o IndexTest IndexTest.cpp ../src/Index.cpp
+        g++ -o CatalogTest CatalogTest.cpp ../src/Catalog.cpp
+运行 IndexTest 和 Catalog
