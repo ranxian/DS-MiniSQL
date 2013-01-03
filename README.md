@@ -8,4 +8,6 @@ $> make cleand
 $> make
 $> ./minisql
 
-then you can refer to the file "TestCommand" under test to test the function of minisql.
+then you can refer to the file "TestCommand" under ./test to test the function of minisql.
+
+面测时间：17号早上10-12点
