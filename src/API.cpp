@@ -70,12 +70,12 @@ int API::insert() {
     index_node_t node; 
     node.offset = record_manager->Insert(info);
 
-    for (map<string, string>::iterator iter = info.insertItems.begin();
-        iter != info.insertItems.end(); iter++) {
+    // for (map<string, string>::iterator iter = info.insertItems.begin();
+    //     iter != info.insertItems.end(); iter++) {
 
-        node.value = iter->second;
-        index_manager->insertIndex(info.tableName, iter->first, node);    
-    }
+    //     node.value = iter->second;
+    //     index_manager->insertIndex(info.tableName, iter->first, node);    
+    // }
 
     return 0;
 }
@@ -105,7 +105,7 @@ int API::deleteRecord() {
     //         index_manager->deleteIndex(info.tableName, table.attributes[i].name, todel->value);
     // }
 
-    return -1;
+    return 0;
 }
 
 // V

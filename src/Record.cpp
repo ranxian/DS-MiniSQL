@@ -356,9 +356,7 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
 /* 基本处理同insert */
 void Record::Update(info_t & update_info, index_node_t & index)
 {
-    update_info = update_info;
     index = index;
-    /*
     string Filename;
     Filename = "../data/" + update_info.tableName + ".rec";
     char *filename = (char *)Filename.c_str();  
@@ -390,7 +388,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
 
         }
         
-        if( judgeResult == 1 || delete_info.tree == NULL)
+        if( judgeResult == 1 || update_info.tree == NULL)
         {
             if (judgeResult == 1)
             {
@@ -409,7 +407,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
                 
                 map<string, string> ::iterator iter;
                 attr_t target = update_info.t.attributes[k];
-                for (iter=insert_info.insertItems.begin(); iter!=insert_info.insertItems.end();
+                for (iter=update_info.updateItems.begin(); iter!=update_info.updateItems.end();
                     iter++)
                 {
                     //如果某个字段在map中存在
@@ -432,7 +430,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
                     }
                 }
                 //这种情况是找到对应字段的情况
-                if (iter != insert_info.insertItems.end())               
+                if (iter != update_info.insertItems.end())               
                     continue;
         
                 //如果某个字段不在map中，则输入空的字节数
@@ -441,66 +439,20 @@ void Record::Update(info_t & update_info, index_node_t & index)
                     string hollow = "oop\0";
                     output.write((char *)hollow.c_str(), target.length);
                 }
-                //cout << "要从" << (int)output.tellp() << "处开始删除" << endl;
-                //string hollow = "oop\0";
-                //output.write((char *)hollow.c_str(), target.attributes[k].length);
-                //output << flush;
-                
-                //cout << "记录" << (int) output.tellp() <<"已删除" << endl;
-                //cout << "reach here\n";
+               
             }
         }
         else if (judgeResult == -1)
         {
             cout << "错误字段 或 字段值为空" << endl;
-            return;
+            
         }
 
         else
             continue;
     }
+    
     output.close();
-    return;
-
-
-
-    string Filename;
-    Filename = "../data/" + update_info.tableName + ".rec";
-    char *filename = (char *)Filename.c_str();  
-    ofstream output;
-    output.open(filename, ios::binary|ios::app|ios::out);
-
-     //定位到相应的记录
-    output.seekp(index.offset, ios::beg);                      
-    map<string, string> ::iterator iter;
-    int i;
-    for (i=0; i<update_info.t.attrNum; i++)                  
-    {                                                           
-        attr_t target = update_info.t.attributes[i];
-        for (iter=update_info.updateItems.begin(); iter!=update_info.updateItems.end();
-            iter++)
-        {
-            //找到对应字段
-            if (target.name == iter->first)                      
-            {
-                char *va = (char *)iter->second.c_str();
-                if (target.type == INT)
-                {
-                    int value = atoi(va);
-                    output.write((char *)&value, sizeof (value));
-                }
-                else
-                {
-                    output.write(va, target.length);
-                }
-                break;
-            }
-
-        }
-
-    }
-    output.close();
-    */
     return;
 
     

@@ -34,6 +34,10 @@ int main()
         {
             Test.Delete(testInfo, jy);
         }
+        else if (testInfo.command == UPDATE)
+        {
+            Test.Update(testInfo, jy);
+        }
         else
         {
             ;
