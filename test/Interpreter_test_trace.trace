@@ -15,7 +15,7 @@ select * from t;
 
 select address.city, address.street_no, travel.city from address, travel;
 
-insert into address (city, street_no) values ('New York', 5);
+insert into address (city, street_no) values ('New York', 5);   
 
 delete from address where street_no < 5;
 
