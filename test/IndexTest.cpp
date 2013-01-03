@@ -33,6 +33,9 @@ int main()
     attr.length = 8;
     attr.type = INT;
 
+    condition_tree_t *cNode = new condition_tree_t;
+    cNode->leftOperand = "学号";
+
     // 建立索引
     cout << "---建立索引：" << endl;
     IndexManager.createIndex("Persons", "学号", attr);
@@ -45,17 +48,39 @@ int main()
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     cout << endl;
 
+    IndexManager.debugPrint("Persons", "学号");
+
     // 查找索引项
     cout << "---查找索引项：" << endl;
-    IndexManager.selectIndex("Persons", "学号", "0", "9999999999", &res);
+
+    cNode->opName = EQ;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
-    IndexManager.selectIndex("Persons", "学号", "1100012957", "1100012957", &res);
+
+    cNode->opName = NE;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
-    IndexManager.selectIndex("Persons", "学号", "1100012952", "1100012958", &res);
+
+    cNode->opName = GT;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
-    IndexManager.selectIndex("Persons", "学号", "1100012952", "1100099999", &res);
+
+    cNode->opName = LT;
+    cNode->rightOperand = "1100099999";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
-    IndexManager.selectIndex("Persons", "学号", "ZHAODIAO", "ZHAODIAO", &res);
+
+    cNode->opName = GTE;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &res);
+    printNode(&res);
+
+    cNode->opName = LTE;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
     cout << endl;
 
@@ -69,25 +94,35 @@ int main()
     IndexManager.updateIndex("Persons", "学号", "1100099999", "1100199999");
     cout << endl;
 
+    IndexManager.debugPrint("Persons", "学号");
+
     // 查找索引项
     cout << "---查找索引项：" << endl;
-    IndexManager.selectIndex("Persons", "学号", "1100012950", "1100012958", &res);
+    cNode->opName = GTE;
+    cNode->rightOperand = "1100012949";
+    IndexManager.selectIndex("Persons", cNode, &res);
     printNode(&res);
     cout << endl;
 
     // 恢复一条索引
-    // IndexManager.debugPrint("Persons", "学号");
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
-    // IndexManager.debugPrint("Persons", "学号");
+    
+    IndexManager.debugPrint("Persons", "学号");
 
     // OR 合并索引列表
     index_node_t ORres, ORres1, ORres2;
     cout << "---OR 合并索引列表：" << endl;
-    IndexManager.selectIndex("Persons", "学号", "1100012950", "1100012957", &ORres);
+
+    cNode->opName = GTE;
+    cNode->rightOperand = "1100012999";
+    IndexManager.selectIndex("Persons", cNode, &ORres);
     printNode(&ORres);
-    IndexManager.selectIndex("Persons", "学号", "1100012957", "1100099999", &ORres1);
+
+    cNode->opName = LTE;
+    cNode->rightOperand = "1100012950";
+    IndexManager.selectIndex("Persons", cNode, &ORres1);
     printNode(&ORres1);
-    cout << endl;
+
     index_node_t **tmp = new index_node_t * [2];
     tmp[0] = &ORres;
     tmp[1] = &ORres1; 
@@ -102,10 +137,17 @@ int main()
     // AND 合并索引列表
     index_node_t ANDres, ANDres1, ANDres2;
     cout << "---AND 合并索引列表：" << endl;
-    IndexManager.selectIndex("Persons", "学号", "1100012950", "1100012957", &ANDres);
+
+    cNode->opName = GTE;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &ANDres);
     printNode(&ANDres);
-    IndexManager.selectIndex("Persons", "学号", "1100012957", "1100099999", &ANDres1);
+
+    cNode->opName = EQ;
+    cNode->rightOperand = "1100012957";
+    IndexManager.selectIndex("Persons", cNode, &ANDres1);
     printNode(&ANDres1);
+
     tmp = new index_node_t * [2];
     tmp[0] = &ANDres;
     tmp[1] = &ANDres1; 
@@ -120,20 +162,29 @@ int main()
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
     IndexManager.insertIndex("Persons", "学号", insertNode[2]);
-    IndexManager.selectIndex("Persons", "学号", "1100099999", "1100099999", &selRes);
+
+    cNode->opName = EQ;
+    cNode->rightOperand = "1100099999";
+    IndexManager.selectIndex("Persons", cNode, &selRes);
     printNode(&selRes);
+
     // 删除一条索引后再搜索
     IndexManager.deleteIndex("Persons", "学号", "1100099999");
-    IndexManager.selectIndex("Persons", "学号", "1100012956", "1100099999", &selRes);
+
+    IndexManager.debugPrint("Persons", "学号");
+
+    cNode->opName = GT;
+    cNode->rightOperand = "1100012956";
+    IndexManager.selectIndex("Persons", cNode, &selRes);
     printNode(&selRes);
     cout << endl;
 
     // 更新索引项
-    // IndexManager.debugPrint("Persons", "学号");
     cout << "---更新索引项：" << endl;
     IndexManager.updateIndex("Persons", "学号", "1100099999", "1100199999");
     cout << endl;
-    // IndexManager.debugPrint("Persons", "学号");
+
+    IndexManager.debugPrint("Persons", "学号");
 
     return 0;
 }
