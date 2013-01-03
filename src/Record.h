@@ -7,7 +7,6 @@
 
 #include "MiniSQL.h"
 
-
 class Record
 {
 public:
@@ -17,7 +16,7 @@ public:
     void Delete(info_t & delete_info, index_node_t & index);
     void Update(info_t & update_info, index_node_t & index);
     record_t *Select(info_t & select_info);
-    void Print(record_t *record);                                 //输出一条记录
+    void Print(record_t *record, info_t & info);                                 //输出一条记录
     void PrintHead(table_t & table);
 private:
     /* 用来某一条记录是否符合条件树的要求，返回值为1则表示符合要求，返回0表示不符合要求，返回-1表示

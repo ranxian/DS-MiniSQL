@@ -1,8 +1,4 @@
-# include "Interpreter.h"
-# include <string.h>
-# include <iostream>
-using namespace std;
-
+#include "Interpreter.h"
 
 Interpreter::Interpreter()
 {
@@ -94,6 +90,11 @@ bool Interpreter::parseCommand()
     /*
      * basic error checking of brackets
      */
+    if (command.size() == 0)
+    {
+        cout << "ERROR: BAD INPUT!\n";
+        return false;
+    } 
     for (i = 0; i < (int)command.size(); i++)
     {
         if (command[i] == "(")
@@ -360,6 +361,7 @@ void Interpreter::clearInfo()
     info.selectedItems.clear();
     info.selectedTable.clear();
     info.insertItems.clear();
+    info.updateItems.clear();
 }
 
 bool Interpreter::parseInsert()  //OK

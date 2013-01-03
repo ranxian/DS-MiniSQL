@@ -161,6 +161,7 @@ struct record_t
 {   
     value_t *value;
     record_t *next;
+    bool isVoid;
 };
 
 /* 全局配置 */

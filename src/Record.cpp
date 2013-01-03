@@ -2,14 +2,9 @@
 Record.cpp
 */
 
-
-
 #include "Record.h"
-#include <stdlib.h>
-#include <iostream>
-using namespace std;
-/* 所有的文件的名字是表的名字后面加后缀.rec */
 
+/* 所有的文件的名字是表的名字后面加后缀.rec */
 
 /* 根据字段名返回字段值类型，0表示整形，1表示字符串，-1表示没有此字段,同时设置
 某个字段相对于每一条记录初始位置的偏移量，为Offset.attriLength为要查找的字段值所占的字节数 */
@@ -18,14 +13,6 @@ int Record::getInfo(table_t table, string infoName, int &Offset, int &attriLengt
     int i;
     Offset = 0;
     attriLength = 0;
-    //cout << "attrnum= " << table.attrNum << endl;
-    /*
-    for (i=0; i<table.attrNum; i++)
-    {
-        cout << "attributes " <<i<<".length= " << table.attributes[i].length<<endl;
-    }
-    */
-
     for (i=0; i<table.attrNum; i++)
     {
         if (i != 0)
@@ -341,7 +328,7 @@ void Record::Delete(info_t & delete_info, index_node_t & index)
         }
         else if (judgeResult == -1)
         {
-            cout << "错误字段 或 字段值为空" << endl;
+            //cout << "错误字段 或 字段值为空" << endl;
             return;
         }
 
@@ -377,8 +364,7 @@ void Record::Update(info_t & update_info, index_node_t & index)
      for(i=0; i<curEnd; i+=update_info.t.recordLength)
     {
         //cout << "文件指针： " << i << endl;
-        if (update_info.tree != NULL)
-        {
+        
             output.close();
             ifstream input;
             input.open(filename, ios::binary|ios::in);
@@ -386,45 +372,52 @@ void Record::Update(info_t & update_info, index_node_t & index)
             input.close();
             output.open(filename, ios::binary|ios::out|ios::in);
 
-        }
         
-        if( judgeResult == 1 || update_info.tree == NULL)
+        
+        if( judgeResult == 1 )
         {
-            if (judgeResult == 1)
-            {
-                //cout << "judgeResult = 1" << endl;
-            }
-            if (update_info.tree == NULL)
-            {
-                //cout << "tree = NULL" << endl;
-            }
             output.seekp(i, ios::beg);
+            int curPos = i;
             //cout << "此时指针位置: " << i << endl;
             //string temp = "oop\0";
              //对所有字段都写入oop串
             for (int k=0; k<target.attrNum; k++)                      
             {
                 
+                
+                
                 map<string, string> ::iterator iter;
                 attr_t target = update_info.t.attributes[k];
+                if (k != 0)
+                {
+                    curPos += update_info.t.attributes[k - 1].length;
+                }
                 for (iter=update_info.updateItems.begin(); iter!=update_info.updateItems.end();
                     iter++)
                 {
                     //如果某个字段在map中存在
                     if (target.name == iter->first)                      
                     {
+                        //cout << "attriname " << target.name << " was found!" << endl;
                          //字段的值本为string类型，先转换为char类型
                         char *va = (char *)iter->second.c_str();
                         //如果是int类型，就将string类型转换为int型，但必须保持数据大小为4字节
                         if (target.type == INT)
                         {
+                            //cout << "update int!" << endl;
+                            output.seekp(curPos, ios::beg);
                             int value = atoi(va);
+                            //cout <<"value= "<<value << endl;
                             output.write((char *)&value, 4);
                         }
                         //如果是char类型，就将string转换为char
                         else 
                         {
+                            
+                            //cout << "update string!" << endl;
+                            output.seekp(curPos, ios::beg);
                             output.write(va, target.length);
+                            //cout <<"va=" << va << endl;
                         }
                         break;
                     }
@@ -433,18 +426,13 @@ void Record::Update(info_t & update_info, index_node_t & index)
                 if (iter != update_info.insertItems.end())               
                     continue;
         
-                //如果某个字段不在map中，则输入空的字节数
-                else                                                     
-                {
-                    string hollow = "oop\0";
-                    output.write((char *)hollow.c_str(), target.length);
-                }
+
                
             }
         }
         else if (judgeResult == -1)
         {
-            cout << "错误字段 或 字段值为空" << endl;
+            //cout << "错误字段 或 字段值为空" << endl;
             
         }
 
@@ -461,10 +449,12 @@ void Record::Update(info_t & update_info, index_node_t & index)
 
 record_t  *Record::Select(info_t & select_info)
 {
+    /*
     if (select_info.tree == NULL)
     {
         cout << "this is a * command! " << endl;
     }
+    */
     //先打开对应的文件
     string Filename;
     //cout << "select_info.tableName=" << select_info.selectedTable[0] << endl;
@@ -479,6 +469,7 @@ record_t  *Record::Select(info_t & select_info)
     output.close();
     ifstream input;
     input.open(filename, ios::binary|ios::in);
+    bool isAllVoid = true;
 
     //curEnd表示文件末位距离文件首的偏移
     //cout << "curEnd= " << curEnd << endl;
@@ -512,6 +503,7 @@ record_t  *Record::Select(info_t & select_info)
         {
             
             
+            isAllVoid = true;
             //cout << "2" <<endl;
             //cout << "record found!" << endl;
             //以下部分为将一条记录打包成record_t的工作
@@ -522,10 +514,12 @@ record_t  *Record::Select(info_t & select_info)
             move = move->next;
             move->next = NULL;
             move->value = new value_t;
+            move->isVoid = false;
             value_t * valueMove = move->value;
             //cout << "3" <<endl;
             for (j=0; j<select_info.t.attrNum; j++)
             {
+                
                 
                 if (j != 0)
                 {
@@ -554,6 +548,7 @@ record_t  *Record::Select(info_t & select_info)
                 //字段值为字符串类型   
                 else if (select_info.t.attributes[j].type == CHAR)
                 {
+                    isAllVoid = false;
                     valueMove->type = CHAR;
                     valueMove->str_value = out;
 
@@ -562,6 +557,7 @@ record_t  *Record::Select(info_t & select_info)
                 //字段值为整形类型
                 else 
                 {
+                    isAllVoid = false;
                     //cout <<"第"<<j+1<<"个记录是整形的"<<endl;
                     valueMove->type = INT;
                     input.seekg(curPos, ios::beg);
@@ -573,11 +569,16 @@ record_t  *Record::Select(info_t & select_info)
                 valueMove->next = NULL;
                 
             }
+            if (isAllVoid)
+            {
+                move->isVoid = true;
+                
+            }
 
         }
         else if (judgeResult == -1)
         {
-            cout << "错误字段! in select" << endl;
+            //cout << "错误字段! in select" << endl;
             return NULL;
         }
 
@@ -595,29 +596,61 @@ record_t  *Record::Select(info_t & select_info)
 }
 
 /* 输出所有符合条件的记录 */
-void Record::Print(record_t * record)
+void Record::Print(record_t * record, info_t & info)
 {
+    //attriOrder记录是第几个字段
+    int attriOrder = 0;
+    //isIn用来判断是否进入了下面的if循环
+    bool isIn = false;
     while (record != NULL)
     {
         value_t *link = record->value; 
+        attriOrder = 0;
+        isIn = false;
         while (link != NULL)
         {
-            //如果记录为空
-            if (link->type == NOATTR)
+            //查找此link
+            
+            for (int i=0; i<info.selectedItems.size(); i++)
             {
-                cout << "NULL ";
+                if ((info.selectedItems[i] == info.t.attributes[attriOrder].name
+                    || info.tree == NULL || info.selectedItems[0] == "*" ) && !record->isVoid )
+                {
+                     /*
+                     if (info.selectedItems[i] == info.t.attributes[attriOrder].name)
+                     {
+                        cout << "items found!" << endl;
+                     }
+                     
+                     if (info.tree == NULL)
+                     {
+                        cout << "info.tree = NULL" << endl;
+                     }
+                     */
+                     isIn = true;
+                     //如果记录为空
+                    if (link->type == NOATTR)
+                    {
+                        cout << "NULL ";
+                    }
+                    else if (link->type == CHAR)
+                    {
+                        cout << link->str_value << " ";
+                    }
+                    else
+                    {
+                        cout << link->int_value << " ";
+                    }
+                }
             }
-            else if (link->type == CHAR)
-            {
-                cout << link->str_value << " ";
-            }
-            else
-            {
-                cout << link->int_value << " ";
-            }
+            attriOrder++;
             link = link->next;
         }
-        cout << endl;
+        if (isIn)
+        {
+            cout << endl;
+        }
+        
         record = record->next;
     }
     
