@@ -611,7 +611,7 @@ void Record::Print(record_t * record, info_t & info)
         {
             //查找此link
             
-            for (int i=0; i<info.selectedItems.size(); i++)
+            for (int i=0; i<(int)info.selectedItems.size(); i++)
             {
                 if ((info.selectedItems[i] == info.t.attributes[attriOrder].name
                     || info.tree == NULL || info.selectedItems[0] == "*" ) && !record->isVoid )
@@ -666,6 +666,6 @@ void Record::PrintHead(table_t & table)
         cout << table.attributes[i].name << " ";
     } 
     cout << endl;
-
-
 }
+
+void DeleteTable(string tableName) { return ;}

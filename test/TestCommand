@@ -33,7 +33,9 @@ delete from Person ;
 
 select * from Person ;
 
-------------------------------------------------------------------------------------
+drop table Person;
+
+--------------------------------------------------------------------------------
 
 Create:
     create table address ( city char, street_no int );

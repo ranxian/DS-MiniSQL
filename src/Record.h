@@ -18,6 +18,7 @@ public:
     record_t *Select(info_t & select_info);
     void Print(record_t *record, info_t & info);                                 //输出一条记录
     void PrintHead(table_t & table);
+    void DeleteTable(string tableName);
 private:
     /* 用来某一条记录是否符合条件树的要求，返回值为1则表示符合要求，返回0表示不符合要求，返回-1表示
     某条记录不含要求的字段值，不需判断。offset为某条记录首地址偏移 */
